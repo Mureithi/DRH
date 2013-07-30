@@ -61,13 +61,15 @@ class Upload_Management extends MY_Controller {
 			$mysql_bin = str_replace("\\", "\\\\", $str);
 			//echo $mysql_bin;
 			$sql = "load data concurrent infile '$csv_file' INTO TABLE $table FIELDS TERMINATED BY ',' ENCLOSED BY '\"\"' LINES TERMINATED BY '\\r\\n'   IGNORE 1 LINES $format_table;" . $next_sql;
-			$mysql_con = "$mysql_bin -u root  -h localhost test --local-infile=1  -e \"$sql\"";
+			$mysql_con = "$mysql_bin -u root  -h localhost drh --local-infile=1  -e \"$sql\"";
 
 			//Code to execute in command line
 			exec($mysql_con);
 			unlink($csv_file);
 			
-      	echo $mysql_con;
+			
+			redirect("/");
+      	//echo $mysql_con;
 		
       }
 	}

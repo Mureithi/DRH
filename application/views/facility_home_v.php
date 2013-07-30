@@ -1,4 +1,4 @@
-<?php include("Scripts/FusionCharts/FusionCharts.php");
+<?php 
 $selectedItem = '';
 
 $current_year = date('Y');
