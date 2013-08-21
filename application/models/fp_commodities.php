@@ -19,7 +19,7 @@ class Fp_commodities extends Doctrine_Record {
 
 	public static function getAllcommodities()
 	{
-		$query = Doctrine_Query::create() -> select("*") -> from("Fp_commodities");
+		$query = Doctrine_Query::create() -> select("*") -> from("Fp_commodities")->OrderBy("fpcommodity_name desc");
 		$result = $query -> execute();
 		return $result;
 	}

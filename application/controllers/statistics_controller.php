@@ -452,5 +452,16 @@ ORDER BY  `myMONTH` ASC ");
 			$this -> load -> view("trend_analyse_v", $data);
 		}
 
+public function pipeline_analysis()
+
+{
+			
+			$data['title'] = "by_district";
+		$data['banner_text'] = "menu";
+		$data['county'] = Counties::getAll();
+		$data['content_view'] = "pipelinestacked_v";
+		$this -> load -> view("template", $data);
+}
+
 		}
 	

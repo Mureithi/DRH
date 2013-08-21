@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en">
 	<style>
@@ -21,7 +23,7 @@ to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
 </style>	
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><?php echo $title;?></title>
+<title>HCMP | Login</title>
 
  <script src="<?php echo base_url().'Scripts/jquery.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/jquery-ui.js'?>" type="text/javascript"></script>
@@ -64,66 +66,12 @@ if (isset($styles)) {
 <script type="text/javascript">
 	$(document).ready(function() {
 		
-			$(function() {
-        var oldp = $( "#oldpassword" ),
-            newp = $( "#newpassword" ),
-            password = $( "#password" ),
-            allFields = $( [] ).add( oldp ).add( newp ).add( password ),
-            tips = $( ".validateTips" );
- 
-         
-        function checkLength( o, n, min, max ) {
-            if ( o.val().length > max || o.val().length < min ) {
-                o.addClass( "ui-state-error" );
-                updateTips( "Length of " + n + " must be between " +
-                    min + " and " + max + "." );
-                return false;
-            } else {
-                return true;
-            }
-        }
- 
-        
- 
-        $( "#dialog-form" ).dialog({
-            autoOpen: false,
-            height: 300,
-            width: 350,
-            modal: true,
-            buttons: {
-                "Change Password": function() {
-                    var bValid = true;
-                    allFields.removeClass( "ui-state-error" );
- 
-                    bValid = bValid && checkLength( password, "password", 6, 16 );
-                    //bValid = bValid && checkLength( oldp, "password", 5, 16 );
-                    bValid = bValid && checkLength( newp, "password", 6, 16 );
- 
-                    // From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
-                    bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
-                    bValid = bValid && checkRegexp( oldp, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
-                     bValid = bValid && checkRegexp( newp, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
- 
-                    if ( bValid ) {
-                       
-                            //run script to change password here
-                        $( this ).dialog( "close" );
-                    }
-                },
-                Cancel: function() {
-                    $( this ).dialog( "close" );
-                }
-            },
-            close: function() {
-                allFields.val( "" ).removeClass( "ui-state-error" );
-            }
-        });
- 
-        $( "#modalbox" ).click(function() {
-                $( "#dialog-form" ).dialog( "open" );
-            });
-    });
-
+			$('.successreset').fadeOut(5000, function() {
+    // Animation complete.
+  });
+$('.errorlogin').fadeOut(5000, function() {
+    // Animation complete.
+  });
 	});
 
 </script>
@@ -138,20 +86,26 @@ if (isset($styles)) {
 </div>
 
 				<div id="Banner">
-					<span style="display: block; font-weight: bold; font-size: 14px; margin:2px;">Ministry Health</span>
-					<span style="display: block; font-size: 12px;">Division of Reproductive Health (DRH)</span>	
+					<span style="display: block; font-weight: bold; font-size: 14px; margin:2px;">Ministry of Health</span>
+					<span style="display: block; font-size: 12px;">Health Commodities Management Platform</span>	
 				</div>
 				<div class="banner_text" style="float: left"><?php //echo $banner_text;?></div>
 				
 	</div>
 	
 	
-<div id="main_wrapper"> 
-<!-------------------------->
-<?php echo validation_errors('<p class="errorlogin">','</p>'); ?>
- <form action="<?php echo base_url().'user_management/submit'?>" method="post" id="login">
+
+<?php echo validation_errors('<p class="errorlogin">','</p>'); 
+
+if (isset($popup)) {
+	
+	echo	'<p class="successreset">Successful reset. Please check your email.</p>';
+}
+unset($popup);
+ ?>
+ <form action="<?php echo base_url().'user_management/submit'?>" method="post" id="slick-login">
   	
-<div id="slick-login">
+<div >
 	 <section class="short_title" >
 	 	<legend class="login_text">Sign in</legend>
 
@@ -166,38 +120,18 @@ Password
 <input type="password" name="password" id="password" placeholder="password">
 </label>
  <input type="submit" class="button " name="register" id="register" value="Log in" style="margin-left:100px;">
- <a class="Homelink" href="#inline" id="modalbox">Forgot your Password ?</a>
+ <a class="Homelink" href="<?php echo base_url().'user_management/forget_pass'?>" id="modalbox">Can't access your account ?</a>
 </form>
 <?php 
+
 		echo form_close();
 		?>
 </div>
 
-<!-- #dialog is the id of a DIV defined in the code below -->
-
-<!-- hidden inline form -->
-<div id="dialog-form">
-	<h2>An email will be sent to you to reset your password</h2>
-
-	<form id="contact" name="contact" action="#" method="post">
-		
-		<label for="email">Your E-mail</label>
-		<input type="email" id="email" name="email" >
-		<br>
-		<button id="send">Send E-mail</button>
-	</form>
-</div>
-
-<!-- basic fancybox setup -->
-
-
-
-    <div id="bottom_ribbon"><div id="footer"><div id="footer_text">
-	Government of Kenya &copy; 2012. All Rights Reserved
+    <div class="footer">
+	Government of Kenya &copy; <?php echo date('Y');?>. All Rights Reserved
 	
-</div>
-<!-- end main wrapper --></div>
-  <!--End Wrapper div--></div>
+	</div>
     
 </body>
 </html>

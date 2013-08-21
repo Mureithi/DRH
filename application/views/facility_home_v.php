@@ -403,4 +403,4 @@ for($x=$current_year;$x>=$earliest_year;$x--){
 		
 	</div>	
 </div>
-<div class="modal">Loading data...Please wait.</div>
+
