@@ -1,16 +1,24 @@
-<SCRIPT LANGUAGE="Javascript" SRC="<?php echo base_url();?>Scripts/FusionCharts/FusionCharts.js"></SCRIPT>
 <script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
 
 <style>
+
+.higherWider {
+    height: 100%;
+    overflow-y: auto;
+    width: 72%;
+   margin-left: -35%;
+   max-height: 70em;
+   
+}
 	
-	.pipelinegraph{
+	.pipeline_data{
 	margin:auto;
 	width:70%;	
 		
 	}
-	.pipelinegraph h2 {
-		background: #195f87; /* Old browsers */
+	.pipeline_data h2 {
+		background: #29527b; /* Old browsers */
 		color: #fff;
 		padding: 8px;
 		margin: 0 0 0.625em 0;
@@ -60,8 +68,7 @@
 <div class="sub-menu">
 <button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#addfpcommodityModal">Enter Stocks on Hand</button>
 <button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#addnewconsModal">Add Consignment</button>
-<button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#receivefpconsModal">Receive Consignment</button>
-<button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#addfpcommodityModal">Delay Consignment</button>
+<button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#updateplanModal">Update Supply Plan</button>
                 
                           
             </div>
@@ -75,6 +82,23 @@
             		
             	</div>
             	<div class="pipeline_data">
+            		<h2>
+		
+		<select  id="commoditychange" name="commoditychange" >
+    <option>Select Commodity</option>
+		<?php 
+		foreach ($fpcommodity as $fpcommodity1) {
+			$id=$fpcommodity1->id;
+			$commodity=$fpcommodity1->fp_name;
+			?>
+			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
+		<?php }
+		?>
+	</select> 
+	<button class="btn btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
+	<a class="link" data-toggle="modal" data-target="#supplyplanModal" href="#">View Supply Plan</a>
+
+	</h2>
             		<div id="graph_content"></div>
             	</div>
             </div>
@@ -83,7 +107,7 @@
 		
 			
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
     <h3 style="font-size: 15px;text-align: center" id="myModalLabel">New Consignment</h3>
       </div>
   
@@ -151,8 +175,8 @@ echo form_close();
 
 <div id="addfpcommodityModal" class="modal hide fade" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    <h3 style="font-size: 15px;text-align: center" id="myModalLabel">New Stock</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+    <h3 style="font-size: 15px;text-align: center" id="myModalLabel">Actual Stock</h3>
       </div>
 <?php 
     $att=array("name"=>'','id'=>'',"class"=>'form-horizontal');
@@ -206,53 +230,120 @@ echo form_close();
   </div>
   </div>
   
-  <div id="receivefpconsModal" class="modal hide fade" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
+  <div id="updateplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
 <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    <h3 style="font-size: 15px;text-align: center" id="myModalLabel">New Stock</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+    <h3 style="font-size: 15px;text-align: center" id="myModalLabel">Update(Edit) Supply Plan</h3>
+      </div>
+<table class="table table-hover table-bordered">
+		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
+			<tr>
+				
+				<th colspan="5" style="text-align:center"></th>
+			</tr>
+		</thead>
+		<thead style="font-size: 13px; background: #C8D2E4 ">
+	<tr>
+		<th>FP Commodity</th>
+		<th>Unit</th>
+		<th>Funding Source</th>
+		<th>E.T.A Details</th>
+		<th>Quantity</th>
+		<th>Action</th>
+		
+	</tr>
+	</thead>
+	<tbody>	<?php 
+		foreach ($supplyplan as  $value) {
+			
+		
+		?>
+					
+						<tr style="font-size: 12px">
+							<td><?php echo $value['fp_name'];?></td>
+							<td><?php echo $value['Unit'];?></td>
+							<td><?php echo $value['funding_source'];?></td>
+							<td><?php echo  date('F j, Y ', strtotime($value['eta_details']));?></td>
+							<td><?php echo $value['pending'];?></td>
+							<td><button class="btn btn-info" id="" name="" >Delay</button> | <button class="btn btn-inverse" id="" name="">Receive</button></td>
+							
+					   </tr>
+					   
+					   <?php }?>
+						
+		</tbody>
+		
+			
+	 
+</table>
+  </div>
+  
+
+  </div>
+  
+  
+  <div id="supplyplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+    <h2 style="font-size: 16px;text-align: center" id="myModalLabel">Estimated Time Of Arrival Of Pending FP Consignments (Public Sector Pipeline)</h2>
+     <h3 style="font-size: 15px;text-align: center" id="myModalLabel">Supply Plan</h3>
       </div>
 <?php 
     $att=array("name"=>'','id'=>'',"class"=>'form-horizontal');
-	 echo form_open('Stocks_management/',$att); ?>
-  <div class="control-group" style="margin-top: 1em;">
-  	
-    <label class="control-label" for="inputcommodity">FP Commodity</label>
-    <div class="controls">
-      <select  id="pipecommodity" name="pipecommodity" >
-    <option>Select Commodity</option>
-		<?php 
-		foreach ($fpcommodity as $fpcommodity3) {
-			$id=$fpcommodity3->id;
-			$commodity3=$fpcommodity3->fp_name;
-			?>
-			<option value="<?php echo $id;?>"><?php echo $commodity3;?></option>
-		<?php }
+	 echo form_open('/',$att); ?>
+  <table class="table table-hover table-bordered">
+		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
+			<tr>
+				
+				<th colspan="5" style="text-align:center"></th>
+			</tr>
+		</thead>
+		<thead style="font-size: 13px; background: #C8D2E4 ">
+	<tr>
+		<th>FP Commodity</th>
+		<th>Unit</th>
+		<th>Funding Source</th>
+		<th>E.T.A Details</th>
+		<th>Quantity</th>
+		
+	</tr>
+	</thead>
+	<tbody>	<?php 
+		foreach ($supplyplan as  $value) {
+			
+		
 		?>
-	</select> 
-    </div>
-  </div>
+					
+						<tr style="font-size: 12px">
+							<td><?php echo $value['fp_name'];?></td>
+							<td><?php echo $value['Unit'];?></td>
+							<td><?php echo $value['funding_source'];?></td>
+							<td><?php echo  date('F j, Y ', strtotime($value['eta_details']));?></td>
+							<td><?php echo $value['pending'];?></td>
+							
+					   </tr>
+					   
+					   <?php }?>
+						
+		</tbody>
+		
+			
+	 
+</table>
   
-  
-  
-  
-  
-  
-  
-<div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    
-  </div>
   </div>
   
   <script>
 	$(document).ready(function() {
 	$(function() {
+		
+		$("#commoditychange").val(3)
 		 $('.mos_kemsa').highcharts({
             chart: {
                 type: 'bar'
             },
             title: {
-                text: 'Stock Status of FP Commodities in Public Sector Pipeline '
+                text: 'Stock Status of FP Commodities in Public Sector Pipeline (2013-2014) '
             },
             xAxis: {
                 categories: <?php echo $arrayfp ?>
@@ -267,6 +358,9 @@ echo form_close();
                 backgroundColor: '#FFFFFF',
                 reversed: true
             },
+            credits: {
+		enabled: false
+		},
             plotOptions: {
                 series: {
                     stacking: 'normal'
@@ -294,7 +388,7 @@ echo form_close();
                 type: 'bar'
             },
             title: {
-                text: 'Stock Status of FP Commodities in Private Sector Pipeline'
+                text: 'Stock Status of FP Commodities in Private Sector Pipeline (2013-2014)'
             },
             xAxis: {
                 categories: ['Male Condoms', 'Female Condoms', 'Injectables', 'COCs', 'POPs', 'EC Pills', 'IUCDs', '1-rod Implants', '2-rod Implants','Cycle Beads']
@@ -325,31 +419,64 @@ echo form_close();
                 data: [2, 2, 3, 2, 1,3,1,3,2,4]
             } ]
         });
-    
+    $('#graph_content').highcharts({
+              title: {
+                text: 'Supply Plan Vs Actual M.O.S (2013-2014)',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Source: DRH',
+                x: -20
+            },
+            xAxis: {
+                categories: <?php echo $montharray ?>
+            },
+            yAxis: {
+                title: {
+                    text: 'Months of Stock (MOS)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: 'MOS',
+                crosshairs: true,
+                shared: true
+            },credits: {
+		enabled: false
+		},
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [ {
+                name: 'Supply Plan',
+                data: <?php echo $arrayto_graph ?>
+            }, {
+                name: 'Actual MOS',
+                data: [3, 2.2, 4, 3.6, 4.5, 4.7, 4.1, 4, 3.4, 5, 4.6, 4.8]
+            }]
+        });
      
-     var chart = new FusionCharts("<?php echo base_url()."scripts/FusionCharts/MSLine.swf"?>", "ChartId4", "100%", "100%", "0", "0");
-    var url = '<?php echo base_url()."Stocks_management/pipeline_chart"?>'; 
-    chart.setDataURL(url);
-    chart.render("graph_content");
-    
+         
     $('#filter').click(function() {
          var div="#graph_content";
-		var url = "<?php echo base_url()."Stocks_management/loadgraph"?>";		
+		var url = "<?php echo base_url()."Stocks_management/supply_plan_filtered"?>";		
 		//url=url+"/"+$("#commoditychange").val();
 		
-		if($("#commoditychange").val() =='0') {
-			return;	
-		}else{
-		ajax_request (url,div)
+				ajax_request (url,div)
 		
-		}
-		
-		
+				
 		});
 		
 		function ajax_request (url,div){
 	var url =url;
-	var loading_icon="<?php echo base_url().'Images/loader.gif' ?>";
+	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
 	 $.ajax({
           type: "POST",
           url: url,
@@ -357,7 +484,7 @@ echo form_close();
           beforeSend: function() {
             $(div).html("");
             
-             $(div).html("<img style='margin-top:-10%;' src="+loading_icon+">");
+             $(div).html("<img style='margin-left:45%;margin-top:15%;' src="+loading_icon+">");
             
           },
           success: function(msg) {

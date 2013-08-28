@@ -66,15 +66,15 @@ if ($access_level == "dpp") {
 <link href="<?php echo base_url().'CSS/bootstrap.css'?>" type="text/css" rel="stylesheet"/>
 <link href="<?php echo base_url().'CSS/bootstrap-responsive.css'?>" type="text/css" rel="stylesheet"/>
 <link href="<?php echo base_url().'CSS/jquery-ui.css'?>" type="text/css" rel="stylesheet"/> 
-<script src="<?php echo base_url().'Scripts/jquery.js'?>" type="text/javascript"></script> 
+<script src="<?php echo base_url().'Scripts/jquery.js'?>" type="text/javascript"></script>
+<script src="<?php echo base_url().'Scripts/bootstrap.js'?>" type="text/javascript"></script> 
+<script src="<?php echo base_url().'Scripts/jquery.form.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/jquery-ui.js'?>" type="text/javascript"></script>
-<!--<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>-->
-
 <script src="<?php echo base_url().'Scripts/validator.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/jquery.validate.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints-sticky.min.js'?>" type="text/javascript"></script>
-<script src="<?php echo base_url().'Scripts/bootstrap.js'?>" type="text/javascript"></script>
+
 
 
 
@@ -215,73 +215,10 @@ return i;
 <?php
 if($user_is_facility){
 ?>
-<li class="<?php
-if ($current == "home_controller") {echo "";
-}
-?>"><a  href="<?php echo base_url(); ?>home_controller">Home </a></li>
+<li class=""><a  href="<?php echo base_url(); ?>home_controller">Home</a></li>
  	 
-<li><a  href="<?php echo base_url(); ?>stocks_management/pipeline" class="<?php
-	
-?>"> Pipeline </a></li>
-
-	
-<!--<a href="<?php echo base_url();?>order_management/all_deliveries/<?php echo $facility?>" class="top_menu_link<?php
-	if ($quick_link == "dispatched_listing_v") {echo " top_menu_ ";
-	}
-	?>">Deliveries</a>-->
-
-
-<?php if($access_level == "fac_user"){} else{?>
-<li><a  href="<?php echo base_url(); ?>user_management/users_manage"  class="<?php
-if ($quick_link == "user_facility_v") {echo "";
-}
-?>">Users</a></li>
- <?php } ?>
-
- 
-<?php } if($user_is_district){ ?>
-	
-	
-		<li class="<?php
-		if ($current == "home_controller") {echo "";
-		}
-	?>"><a data-clone="Home" href="<?php echo base_url(); ?>home_controller">Home </a></li>
-	<!--<li><a data-clone="Actions" href="<?php echo base_url();?>dp_facility_list/actions"  class="<?php
-	if ($quick_link == "actions") {echo "";
-	}
-?>">Actions</a></li>-->
-	 	<li><a data-clone="District Orders" href="<?php echo base_url(); ?>order_approval/district_orders"  class="<?php
-		if ($quick_link == "new_order") {echo "";
-		}
-	?>">District Orders</a></li>
-
-<li><a data-clone="District Facilities" href="<?php echo base_url(); ?>order_approval/district_orders"  class="<?php
-if ($quick_link == "new_order") {echo "";
-}
-?>">District Facilities</a></li>
-
-	 	<li><a href="<?php echo base_url(); ?>user_management/dist_manage"  class="<?php
-		if ($current == "user_management") {echo "";
-		}
-	?>">Users</a></li>
-	
-	<li><a  href="<?php echo base_url(); ?>report_management/division_reports"  class="<?php
-	if ($quick_link == "new_order") {echo "";
-	}
-?>">Reports</a></li>
-
-
-	<li><a  href="<?php echo base_url(); ?>report_management/commodity_list" class="<?php
-	if ($quick_link == "commodity_list") {echo "";
-	}
-?>">Commodity List</a></li>
-<!--	<li><a data-clone="Facility List" href="<?php echo base_url();?>dp_facility_list/get_facility_list"  class="<?php
-	if ($quick_link == "facility_list") {echo "";
-	}
-?>">Facility List</a></li>-->
-
-
-	<?php } ?>
+<li><a  href="<?php echo base_url(); ?>stocks_management/pipeline" class="">Pipeline</a></li>
+<?php }  ?>
 <?php if($user_is_kemsa){
 	?>
 	<li><a data-clone="Orders" href="<?php echo site_url('order_management/kemsa_order_v'); ?>"  class="<?php
@@ -296,107 +233,6 @@ if ($quick_link == "new_order") {echo "";
 	}
 ?>">Users</a></li>
 	<?php } ?>
-<?php if($user_is_rtk_manager){
-	?>
-	<li class=""><a data-clone="Home" href="<?php echo base_url(); ?>home_controller">Home </a></li>
-	<li><a data-clone="Facility Mapping" href="<?php echo site_url('rtk_management/rtk_mapping'); ?>"  class="<?php
-	if ($quick_link == "kemsa_order_v") {echo "";
-	}
-?>">Facility Mapping</a></li>
-	<?php } ?>
-<?php if($user_is_moh_user){
-	?>
-
-<li class="<?php
-if ($current == "home_controller") {echo "";
-}
-?>"><a data-clone="Home" href="<?php echo base_url(); ?>home_controller">Home </a></li>
-
-	<li>
-		<a data-clone="Stock Level"  href="<?php echo site_url('stock_management/stock_level_moh'); ?>" class="<?php
-		if ($quick_link == "load_stock") {echo "";
-		}
-	?>">Stock Level</a></li>
-	<li><a data-clone="View Orders"  href="<?php echo site_url('order_management/moh_order_v'); ?>" class="<?php
-	if ($quick_link == "moh_order_v") {echo "";
-	}
-	?>">View Orders</a></li>
-	<li><a data-clone="Unconfirmed Orders"  href="<?php echo site_url('order_management/unconfirmed'); ?>" class="<?php
-	if ($quick_link == "unconfirmed_orders") {echo "";
-	}
-	?>">Unconfirmed Orders</a></li>
-	<li><a data-clone="Trends" href="<?php echo site_url('raw_data/trends'); ?>"   class="<?php
-	if ($quick_link == "trends") {echo "";
-	}
-	?>">Trends</a></li>
-	
-
-<?php } ?>
-
-<?php if($user_is_county_facilitator){
-	?>
-	<li class=""><a data-clone="Home" href="<?php echo base_url(); ?>home_controller">Home </a></li>
-	<!--<li class=""><a data-clone="Orders" href="<?php echo base_url();?>rtk_management/rtk_orders">Orders</a></li>-->
-	<li class=""><a data-clone="Deliveries" href="<?php echo base_url(); ?>stock_expiry_management/county_deliveries">Deliveries</a></li>
-	<li class=""><a data-clone="Expiries" href="<?php echo base_url(); ?>stock_expiry_management/county_expiries">Expiries</a></li>
-	<li class=""><a data-clone="Commodity List" href="<?php echo base_url(); ?>report_management/commodity_list">Commodity List</a></li>
-	<li><a data-clone="Facility Mapping" href="<?php echo site_url('report_management/get_county_facility_mapping'); ?>"  class="<?php
-	if ($quick_link == "kemsa_order_v") {echo "";
-	}
-?>">Facility Mapping</a></li>
-	<?php } ?>
-<?php if($user_is_dpp){
-	?>
-	<li class=""><a data-clone="Home" href="<?php echo base_url();?>home_controller">Home </a></li>
-	<li class=""><a data-clone="Orders" href="<?php echo base_url();?>rtk_management/rtk_orders">Orders</a></li>
-	<li><a data-clone="Facility Mapping" href="<?php echo site_url('rtk_management/rtk_mapping/dpp');?>"  class="<?php
-	if ($quick_link == "kemsa_order_v") {echo "";
-	}
-?>">Facility Mapping</a></li>
-	<?php
-}
-?>
-<?php if($user_is_allocation_committee){
-	?>
-	<li class=""><a data-clone="RTK Home" href="<?php echo base_url();?>home_controller">RTK</a></li>
-<!--	<li><a  data-clone="RTK Allocation" href="<?php echo base_url();?>rtk_management/national_allocation">Allocation</a></li>
-	<li><a  data-clone="CD4 Home" href="<?php echo base_url();?>cd4_management/">CD4</a></li>-->
-	<li><a  data-clone="CD4 Allocation" href="<?php echo base_url();?>cd4_management">CD4</a></li>
-	<?php } ?>
-<?php if($user_is_moh){
-	?>
-	
-<li class="<?php
-if ($current == "home_controller") {echo "";
-}
-?>"><a data-clone="Home" href="<?php echo base_url(); ?>home_controller">Home </a></li>
-	
-		
-		<li><a data-clone="Users" href="<?php echo base_url(); ?>user_management/moh_manage" class="<?php
-		if ($current == "user_management") {echo "";
-		}
-	?>">Users</a></li>
-	
-	<li><a data-clone="Stock Level"  href="<?php echo site_url('stock_management/stock_level_moh'); ?>"   <?php
-	if ($quick_link == "load_stock") {echo "top_menu_";
-	}
-	?>">Stock</a></li>
-	<li><a data-clone="Orders"   href="<?php echo site_url('order_management/moh_order_v'); ?>"  <?php
-	if ($quick_link == "moh_order_v") {echo "top_menu_";
-	}
-	?>>Orders</a></li>
-	<li>
-		<a data-clone="Trends" href="<?php echo site_url('raw_data/trends'); ?>" <?php
-		if ($quick_link == "trends") {echo "";
-		}
-	?>>Trends</a>
-	</li>
-    <li><a data-clone="Consumption"  href="<?php echo site_url('raw_data/getCounty'); ?>"   <?php
-	if ($quick_link == "Consumption") {echo "";
-	}
-	?>>Consumption</a>
-	</li>
-<?php } ?>
 
 </ul>
 </nav>
