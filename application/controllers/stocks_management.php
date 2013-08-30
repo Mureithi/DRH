@@ -13,37 +13,61 @@ function __construct() {
 			$data['stock_entry'] = Fpcommodities::getAllfpcommodities();
 			$this -> load -> view("template" , $data);
 			}
+			
+			public function submit_pipeline() {
+
+			$pipecommodity = $_POST[
+		'pipecommodity'];
+		$funding_source = $_POST['funding_source'];
+		$quantity = $_POST['quantity'];
+		$datetime = $_POST['etadetails'];
+		//$thedate=date('y-m-d', strtotime($datetime));
+
+		
+			//$response = array('msg' => 'You have entered a wrong password.', 'response' => 'false');
+			//echo json_encode($response);
+	
+
+			$u1 = new Pipeline_management();
+			$u1 -> fpcommodity_Id = $pipecommodity;
+			$u1 -> funding_source = $funding_source;
+			$u1 -> eta_details = date('y-m-d', strtotime($datetime));
+			$u1 -> pending = $quantity;
+			$u1 -> save();
+
+			$response = array('msg' => 'Successfull Entry.', 'response' => 'true');
+			$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
+			echo json_encode($response);
+
+			//$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
+			//redirect('Home_Controller');
+		
+
+	}
 public function submit_stock_status() {
 
-			$fpid = $_POST[
-		'fpid'];
-			$SOHKEMSA = $_POST['SOHKEMSA'];
-			$SOHPSI = $_POST['SOHPSI'];
-			$PendingKEMSA = $_POST['PendingKEMSA'];
-			$PendingPSI = $_POST['PendingPSI'];
-			$thedate = $_POST['date_stock'];
-			$j = sizeof($fpid);
-			$count = 0;
+		$commodity = $_POST['actualcommodity'];
+		$store = $_POST['store'];
+		$quantity = $_POST['qty'];
+		$datetime = $_POST['dateofstock'];
+		//$thedate=date('y-m-d', strtotime($datetime));
 
-			for ($me = 0; $me < $j; $me++) {
+		
+			//$response = array('msg' => 'You have entered a wrong password.', 'response' => 'false');
+			//echo json_encode($response);
+	
 
-			if ($SOHKEMSA[$me] > 0) {
-			$count++;
+			$u1 = new Fp_Stocks();
+			$u1 -> fpcommodity_id = $commodity;
+			$u1 -> soh_storeqty = $quantity;
+			$u1 -> soh_storeName = $store;
+			$u1 -> date = date('y-m-d', strtotime($datetime));
+			
+			$u1 -> save();
 
-			$mydata = array('fpcommodity_id' => $fpid[$me], 'soh_Kemsa' => $SOHKEMSA[$me], 'soh_Psi' => $SOHPSI[$me], 'pending_Kemsa' => $PendingKEMSA[$me], 'pending_Psi' => $PendingPSI[$me], 'date' => date('y-m-d', strtotime($thedate)));
-
-			$u = new Fp_Stocks();
-
-			$u -> fromArray($mydata);
-
-			$u -> save();
-
-			}
-
-			}
-
-			$this -> session -> set_flashdata('system_success_message', "Successful Data entry");
-			redirect('stocks_management_controller' );
+			$response = array('msg' => 'Successfull Entry.', 'response' => 'true');
+			$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
+			echo json_encode($response);
 			}
 
 public function pipeline() {
@@ -69,9 +93,64 @@ public function pipeline() {
 			$arraypending = json_encode($arraypending);
 			$arraydelayed = json_encode($arraydelayed);
 			$arrayreceived = json_encode($arrayreceived);
-			//$e=Pipeline_management::get_supplyplan();
-			//var_dump($e);
-			//exit;
+			
+			$con = Doctrine_Manager::getInstance() -> connection();
+			$st = $con -> execute("SELECT fp_name,SUM(soh_storeqty/projected_monthly_c) as sohkemsa
+FROM  `fp_stocks` , fpcommodities
+WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` 
+AND soh_storeName='KEMSA'
+GROUP BY fpcommodities.fp_name ");
+			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+			$arrayfpkemsa = array();
+			$arraysohkemsa = array();
+			foreach ($result as $value) {
+
+			$arrayfpkemsa[] = $value['fp_name'];
+			$arraysohkemsa[] = (double)$value['sohkemsa'];
+			}
+
+			$arrayfpkemsa = json_encode($arrayfpkemsa);
+			$arraysohkemsa = json_encode($arraysohkemsa);
+			
+			$con = Doctrine_Manager::getInstance() -> connection();
+			$st = $con -> execute("SELECT fp_name,SUM(soh_storeqty/projected_monthly_c) as sohpsi
+FROM  `fp_stocks` , fpcommodities
+WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` 
+AND soh_storeName='PSI'
+GROUP BY fpcommodities.fp_name ");
+			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+			$arrayfppsi = array();
+			$arraysohpsi = array();
+			foreach ($result as $value) {
+
+			$arrayfppsi[] = $value['fp_name'];
+			$arraysohpsi[] = (double)$value['sohpsi'];
+			}
+
+			$arrayfppsi = json_encode($arrayfppsi);
+			$arraysohpsi = json_encode($arraysohpsi);
+			$con = Doctrine_Manager::getInstance() -> connection();
+			$st = $con -> execute("SELECT * FROM (SELECT CASE 
+WHEN MONTH( fp_stocks.date ) >=7
+THEN CONCAT( YEAR( fp_stocks.date ) ,  '-', YEAR( fp_stocks.date ) +1 ) 
+ELSE CONCAT( YEAR( fp_stocks.date ) -1,  '-', YEAR( fp_stocks.date ) ) 
+END AS financial_year, SUM( soh_storeqty / projected_monthly_c ) AS sohkemsa, MONTHNAME( fp_stocks.date ) AS monthname
+FROM fp_stocks, fpcommodities
+WHERE soh_storeName =  'KEMSA'
+AND fpcommodities.id =3
+GROUP BY MONTH( fp_stocks.date )
+) AS temp
+WHERE financial_year =  '2013-2014' ");
+			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+			
+			$arrayactual = array();
+			foreach ($result as $value) {
+
+			$arrayactual[] = (double)$value['sohkemsa'];
+			
+			}
+
+			
 			//create array to carry months
 	$montharray = array(
 	7 => 'July',8 => 'August',9 => 'September',	10 => 'October',11 => 'November',12 => 'December',1 => 'January',2 => 'Febuary',3 => 'March',4 => 'April',5 => 'May',6 => 'June');
@@ -120,28 +199,40 @@ public function pipeline() {
 	foreach ($arrayfinal as $key => $value) {
 	$for_calculate[]=$arrayfinal[$key];
 	}
-	$i=0;
+		for ($i=0; $i <11 ;) { 
+		
+	
 	foreach ($for_calculate as $key => $value) {
 		//check for the 1st index
 		
 		if($i==0){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[$key]=3;
+			$for_calculate[$key]=$arrayactual[0];
 			 
 		}	
 		}
+		
 		//clean rest of the array
 		if($i==1){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[1]=$for_calculate[0]-1;
-			 
+			
+			 if ($for_calculate[0]-1 <0) {
+				 $for_calculate[1]=0;
+			 }else {
+				 $for_calculate[1]=$for_calculate[0]-1;
+			 }
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[1]=$for_calculate[0]+$for_calculate[1];
 		}	
 		}
 		if($i==2){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[2]=$for_calculate[1]-1;
+			
+			if ($for_calculate[1]-1 < 0) {
+				 $for_calculate[2]=0;
+			 }else {
+				 $for_calculate[2]=$for_calculate[1]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[2]=$for_calculate[1]+$for_calculate[2];
@@ -149,7 +240,12 @@ public function pipeline() {
 		}
 		if($i==3){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[3]=$for_calculate[2]-1;
+			
+			if ($for_calculate[2]-1 < 0) {
+				 $for_calculate[3]=0;
+			 }else {
+				 $for_calculate[3]=$for_calculate[2]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[3]=$for_calculate[3]+$for_calculate[2];
@@ -157,7 +253,12 @@ public function pipeline() {
 		}
 		if($i==4){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[4]=$for_calculate[3]-1;
+			
+			if ($for_calculate[3]-1 < 0) {
+				 $for_calculate[4]=0;
+			 }else {
+				 $for_calculate[4]=$for_calculate[3]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[4]=$for_calculate[4]+$for_calculate[3];
@@ -165,7 +266,12 @@ public function pipeline() {
 		}
 		if($i==5){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[5]=$for_calculate[4]-1;
+			
+			if ($for_calculate[4]-1 < 0) {
+				 $for_calculate[5]=0;
+			 }else {
+				 $for_calculate[5]=$for_calculate[4]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[5]=$for_calculate[5]+$for_calculate[4];
@@ -173,7 +279,12 @@ public function pipeline() {
 		}
 		if($i==6){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[6]=$for_calculate[5]-1;
+			
+			if ($for_calculate[5]-1 < 0) {
+				 $for_calculate[6]=0;
+			 }else {
+				 $for_calculate[6]=$for_calculate[5]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[6]=$for_calculate[6]+$for_calculate[5];
@@ -181,7 +292,12 @@ public function pipeline() {
 		}
 		if($i==7){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[7]=$for_calculate[6]-1;
+			
+			if ($for_calculate[6]-1 < 0) {
+				 $for_calculate[7]=0;
+			 }else {
+				 $for_calculate[7]=$for_calculate[6]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[7]=$for_calculate[7]+$for_calculate[6];
@@ -189,7 +305,12 @@ public function pipeline() {
 		}
 		if($i==8){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[8]=$for_calculate[7]-1;
+			
+			if ($for_calculate[7]-1 < 0) {
+				 $for_calculate[8]=0;
+			 }else {
+				 $for_calculate[8]=$for_calculate[7]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[8]=$for_calculate[8]+$for_calculate[7];
@@ -197,7 +318,12 @@ public function pipeline() {
 		}
 		if($i==9){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[9]=$for_calculate[8]-1;
+			
+			if ($for_calculate[8]-1 < 0) {
+				 $for_calculate[9]=0;
+			 }else {
+				 $for_calculate[9]=$for_calculate[8]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[9]=$for_calculate[9]+$for_calculate[8];
@@ -205,7 +331,12 @@ public function pipeline() {
 		}
 		if($i==10){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[10]=$for_calculate[9]-1;
+			
+			if ($for_calculate[9]-1 < 0) {
+				 $for_calculate[10]=0;
+			 }else {
+				 $for_calculate[10]=$for_calculate[9]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[10]=$for_calculate[10]+$for_calculate[9];
@@ -213,7 +344,12 @@ public function pipeline() {
 		}
 		if($i==11){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[11]=$for_calculate[10]-1;
+			
+			if ($for_calculate[10]-1 < 0) {
+				 $for_calculate[11]=0;
+			 }else {
+				 $for_calculate[11]=$for_calculate[10]-1;
+			 }
 			 
 		}elseif ($for_calculate[$i]>0) {
 			$for_calculate[11]=$for_calculate[11]+$for_calculate[10];
@@ -223,6 +359,7 @@ public function pipeline() {
 		
    $i++;
    
+	}
 	}
 		$arraytograph=array_combine($montharray, $for_calculate);
 		$arrayto_graph = array();
@@ -240,14 +377,22 @@ public function pipeline() {
 		 $montharray = json_encode($mymontharray);
 	//exit;
 	//var_dump($arraytograph);
-
+			
+			$arrayactual = json_encode($arrayactual);
 			$data['title'] = "Pipeline";
 			$data['content_view'] = "pipeline_home_v";
 			$data['banner_text'] = "Pipeline Management";
 			$data['arrayto_graph'] = $arrayto_graph;
+			$data['arrayactual'] = $arrayactual;
 			$data['montharray'] = $montharray;
 			$data['arrayfp'] = $arrayfp;
 			$data['arraypending'] = $arraypending;
+			
+			$data['arrayfpkemsa'] = $arrayfpkemsa;
+			$data['arraysohkemsa'] = $arraysohkemsa;
+			$data['arrayfppsi'] = $arrayfppsi;
+			$data['arraysohpsi'] = $arraysohpsi;
+			
 			$data['arraydelayed'] = $arraydelayed;
 			$data['arrayreceived'] = $arrayreceived;
 			$data['supplyplan'] =Pipeline_management::get_supplyplan();
@@ -256,36 +401,30 @@ public function pipeline() {
 			$this -> load -> view("template", $data);
 			}
 
-public function submit_pipeline() {
 
-			$pipecommodity = $_POST[
-		'pipecommodity'];
-		$funding_source = $_POST['funding_source'];
-		$quantity = $_POST['quantity'];
-		$datetime = $_POST['etadetails'];
-		//$thedate=date('y-m-d', strtotime($datetime));
-
-		
-			//$response = array('msg' => 'You have entered a wrong password.', 'response' => 'false');
-			//echo json_encode($response);
+public function editSupply_plan()
+{
 	
+			$data['content_view'] = "edit_supplyplan_v";
+			$data['title'] = "Edit Supply Plan";
+			$data['banner_text'] = "Edit Supply Plan";
+			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+			$data['supplyplan'] =Pipeline_management::get_supplyplan();
+			$this -> load -> view("template", $data);
+			
+}
 
-			$u1 = new Pipeline_management();
-			$u1 -> fpcommodity_Id = $pipecommodity;
-			$u1 -> funding_source = $funding_source;
-			$u1 -> eta_details = date('y-m-d', strtotime($datetime));
-			$u1 -> pending = $quantity;
-			$u1 -> save();
-
-			$response = array('msg' => 'Successfull Entry.', 'response' => 'true');
-			//$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
-			echo json_encode($response);
-
-			//$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
-			//redirect('Home_Controller');
-		
-
-	}
+public function Supply_plan_vs_actual()
+{
+	
+			$data['content_view'] = "supplyplan_vs_actual";
+			$data['title'] = "Supply Plan Vs Actual";
+			$data['banner_text'] = "Supply Plan Vs Actual";
+			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+			$data['supplyplan'] =Pipeline_management::get_supplyplan();
+			$this -> load -> view("template", $data);
+			
+}
 
 	
 	
@@ -294,6 +433,26 @@ public function supply_plan_filtered()
 		
 		$commodity=$_POST['commoditychange'];
 	//create array to carry months
+	$con = Doctrine_Manager::getInstance() -> connection();
+	$st = $con -> execute("SELECT * FROM (SELECT CASE 
+WHEN MONTH( fp_stocks.date ) >=7
+THEN CONCAT( YEAR( fp_stocks.date ) ,  '-', YEAR( fp_stocks.date ) +1 ) 
+ELSE CONCAT( YEAR( fp_stocks.date ) -1,  '-', YEAR( fp_stocks.date ) ) 
+END AS financial_year, SUM( soh_storeqty / projected_monthly_c ) AS sohkemsa, MONTHNAME( fp_stocks.date ) AS monthname
+FROM fp_stocks, fpcommodities
+WHERE soh_storeName =  'KEMSA'
+AND fpcommodities.id =$commodity
+GROUP BY MONTH( fp_stocks.date )
+) AS temp
+WHERE financial_year =  '2013-2014' ");
+			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+			
+			$arrayactual = array();
+			foreach ($result as $value) {
+
+			$arrayactual[] = (double)$value['sohkemsa'];
+			
+			}
 	$montharray = array(
 	7 => 'July',	8 => 'August',	9 => 'September',	10 => 'October',	11 => 'November',	12 => 'December',1 => 'January',	2 => 'Febuary',	3 => 'March',	4 => 'April',	5 => 'May',	6 => 'June'	);
 	//query db for data
@@ -338,7 +497,7 @@ public function supply_plan_filtered()
 		
 		if($i==0){
 		if ($for_calculate[$i]==0) {
-			$for_calculate[$key]=3;
+			$for_calculate[$key]=$arrayactual[0];
 			 
 		}	
 		}
@@ -505,8 +664,9 @@ public function supply_plan_filtered()
 		}
 		 $montharray = json_encode($mymontharray);
 		$arrayto_graph = json_encode($arrayto_graph);
-		
+		$arrayactual = json_encode($arrayactual);
 		$data['arrayto_graph'] = $arrayto_graph;
+		$data['arrayactual'] = $arrayactual;
 		$data['montharray'] = $montharray;
 		//$data['content_view'] = "supply_plan_v";
 		//$data['banner_text'] = "charts";

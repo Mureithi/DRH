@@ -218,21 +218,10 @@ if($user_is_facility){
 <li class=""><a  href="<?php echo base_url(); ?>home_controller">Home</a></li>
  	 
 <li><a  href="<?php echo base_url(); ?>stocks_management/pipeline" class="">Pipeline</a></li>
+<li><a  href="<?php echo base_url(); ?>" class="">Settings</a></li>
 <?php }  ?>
-<?php if($user_is_kemsa){
-	?>
-	<li><a data-clone="Orders" href="<?php echo site_url('order_management/kemsa_order_v'); ?>"  class="<?php
-	if ($quick_link == "kemsa_order_v") {echo "";
-	}
-?>">Orders</a></li>
-	<?php } ?>
-<?php if($user_is_super_admin){
-	?>
-	<li><a data-clone="User" href="<?php echo site_url('user_management/create_user_super_admin'); ?>"  class="<?php
-	if ($quick_link == "kemsa_order_v") {echo "";
-	}
-?>">Users</a></li>
-	<?php } ?>
+
+
 
 </ul>
 </nav>

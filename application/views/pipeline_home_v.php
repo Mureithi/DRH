@@ -68,8 +68,10 @@
 <div class="sub-menu">
 <button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#addfpcommodityModal">Enter Stocks on Hand</button>
 <button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#addnewconsModal">Add Consignment</button>
-<button class="btn btn-primary" id="submitpipeline" name="submitpipeline" data-toggle="modal" data-target="#updateplanModal">Update Supply Plan</button>
-                
+
+ <a class="btn btn-primary " href="<?php echo base_url(); ?>stocks_management/editSupply_plan">Update Supply Plan</a>
+
+               
                           
             </div>
             
@@ -85,7 +87,7 @@
             		<h2>
 		
 		<select  id="commoditychange" name="commoditychange" >
-    <option>Select Commodity</option>
+    <option value="0">Select Commodity</option>
 		<?php 
 		foreach ($fpcommodity as $fpcommodity1) {
 			$id=$fpcommodity1->id;
@@ -180,12 +182,12 @@ echo form_close();
       </div>
 <?php 
     $att=array("name"=>'','id'=>'',"class"=>'form-horizontal');
-	 echo form_open('Stocks_management/',$att); ?>
+	 echo form_open('Stocks_management/submit_stock_status',$att); ?>
   <div class="control-group" style="margin-top: 1em;">
   	
     <label class="control-label" for="inputcommodity">FP Commodity</label>
     <div class="controls">
-      <select  id="pipecommodity" name="pipecommodity" >
+      <select  id="actualcommodity" name="actualcommodity" >
     <option>Select Commodity</option>
 		<?php 
 		foreach ($fpcommodity as $fpcommodity3) {
@@ -202,10 +204,10 @@ echo form_close();
   <div class="control-group" >
     <label class="control-label" for="Store">Store</label>
     <div class="controls">
-       <select>
-       	<option>Select Store</option>
-       	<option>KEMSA</option>
-       	<option>PSI</option>
+       <select id="store" name="store">
+       	<option value="0">Select Store</option>
+       	<option value="KEMSA">KEMSA</option>
+       	<option value="PSI">PSI</option>
        </select>
     </div>
   </div>
@@ -213,7 +215,7 @@ echo form_close();
   <div class="control-group" >
     <label class="control-label" for="actualqty">Actual Quantity</label>
     <div class="controls">
-       <input type="text" id="actualqty" name="actualqty" placeholder="Quantity">
+       <input type="text" id="qty" name="qty" placeholder="Quantity">
     </div>
   </div>
   
@@ -226,60 +228,13 @@ echo form_close();
   
 <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    <button class="btn btn-primary" id="" name="" >Submit</button>
+     <button class="btn btn-primary" id="submitactual" name="submitactual">Submit</button>
   </div>
   </div>
   
-  <div id="updateplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-    <h3 style="font-size: 15px;text-align: center" id="myModalLabel">Update(Edit) Supply Plan</h3>
-      </div>
-<table class="table table-hover table-bordered">
-		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
-			<tr>
-				
-				<th colspan="5" style="text-align:center"></th>
-			</tr>
-		</thead>
-		<thead style="font-size: 13px; background: #C8D2E4 ">
-	<tr>
-		<th>FP Commodity</th>
-		<th>Unit</th>
-		<th>Funding Source</th>
-		<th>E.T.A Details</th>
-		<th>Quantity</th>
-		<th>Action</th>
-		
-	</tr>
-	</thead>
-	<tbody>	<?php 
-		foreach ($supplyplan as  $value) {
-			
-		
-		?>
-					
-						<tr style="font-size: 12px">
-							<td><?php echo $value['fp_name'];?></td>
-							<td><?php echo $value['Unit'];?></td>
-							<td><?php echo $value['funding_source'];?></td>
-							<td><?php echo  date('F j, Y ', strtotime($value['eta_details']));?></td>
-							<td><?php echo $value['pending'];?></td>
-							<td><button class="btn btn-info" id="" name="" >Delay</button> | <button class="btn btn-inverse" id="" name="">Receive</button></td>
-							
-					   </tr>
-					   
-					   <?php }?>
-						
-		</tbody>
-		
-			
-	 
-</table>
-  </div>
-  
-
-  </div>
+<?php
+echo form_close();
+?>
   
   
   <div id="supplyplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
@@ -319,7 +274,7 @@ echo form_close();
 							<td><?php echo $value['Unit'];?></td>
 							<td><?php echo $value['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($value['eta_details']));?></td>
-							<td><?php echo $value['pending'];?></td>
+							<td><?php echo number_format($value['pending']) ;?></td>
 							
 					   </tr>
 					   
@@ -346,7 +301,7 @@ echo form_close();
                 text: 'Stock Status of FP Commodities in Public Sector Pipeline (2013-2014) '
             },
             xAxis: {
-                categories: <?php echo $arrayfp ?>
+                categories: <?php echo $arrayfpkemsa ?>
             },
             yAxis: {
                 min: 0,
@@ -373,8 +328,8 @@ echo form_close();
                 name: 'Delayed Consignment',
                 data: <?php echo $arraydelayed ?>
             }, {
-                name: 'Received Consignment',
-                data: <?php echo $arrayreceived ?>
+                name: 'Actual Stocks',
+                data: <?php echo $arraysohkemsa ?>
             }]
         });
         
@@ -391,7 +346,7 @@ echo form_close();
                 text: 'Stock Status of FP Commodities in Private Sector Pipeline (2013-2014)'
             },
             xAxis: {
-                categories: ['Male Condoms', 'Female Condoms', 'Injectables', 'COCs', 'POPs', 'EC Pills', 'IUCDs', '1-rod Implants', '2-rod Implants','Cycle Beads']
+                categories: <?php echo $arrayfppsi ?>
             },
             yAxis: {
                 min: 0,
@@ -413,10 +368,7 @@ echo form_close();
 		},
                 series: [{
                 name: 'Stores MOS',
-                data: [5, 3, 4, 7, 2,3,6,1,3,4]
-            }, {
-                name: 'SDP MOS',
-                data: [2, 2, 3, 2, 1,3,1,3,2,4]
+                data: <?php echo $arraysohpsi ?>
             } ]
         });
     $('#graph_content').highcharts({
@@ -459,7 +411,7 @@ echo form_close();
                 data: <?php echo $arrayto_graph ?>
             }, {
                 name: 'Actual MOS',
-                data: [3, 2.2, 4, 3.6, 4.5, 4.7, 4.1, 4, 3.4, 5, 4.6, 4.8]
+                data: <?php echo $arrayactual ?>
             }]
         });
      
@@ -508,6 +460,45 @@ echo form_close();
 	            	url:$('#submitpipeline').attr('action'),
 					cache:"false",
 					data:$('#submitpipeline').serialize(),
+					dataType:'json',
+					beforeSend:function(){
+						 $("#err").html("Processing...");
+					},
+					complete:function(){
+						
+					},
+					success: function(data){
+						//return;
+						//alert(data.response);
+					if(data.response=='false'){
+						
+						 $('#err').html(data.msg);
+						
+							}else if(data.response=='true'){
+								alert('haha');
+								return;
+								$("#err").empty();
+								
+								$('#err').html(data.msg);
+								
+							}
+
+						}
+	
+							
+	});
+
+	return false;
+	});
+	
+	$('#submitactual').submit(function(){
+			
+			 $.ajax({
+	            type: $('#submitactual').attr('method'),
+
+	            	url:$('#submitactual').attr('action'),
+					cache:"false",
+					data:$('#submitactual').serialize(),
 					dataType:'json',
 					beforeSend:function(){
 						 $("#err").html("Processing...");

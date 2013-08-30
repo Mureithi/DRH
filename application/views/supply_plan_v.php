@@ -47,7 +47,7 @@ $(document).ready(function() {
                 data: <?php echo $arrayto_graph ?>
             }, {
                 name: 'Actual MOS',
-                data: [3, 2.2, 4, 3.6, 4.5, 4.7, 4.1, 4, 3.4, 5, 4.6, 4.8]
+                data: <?php echo $arrayactual ?>
             }]
        		 });
        
