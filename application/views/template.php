@@ -217,7 +217,7 @@ if($user_is_facility){
 ?>
 <li class=""><a  href="<?php echo base_url(); ?>home_controller">Home</a></li>
  	 
-<li><a  href="<?php echo base_url(); ?>stocks_management/pipeline" class="">Pipeline</a></li>
+<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Pipeline</a></li>
 <li><a  href="<?php echo base_url(); ?>" class="">Settings</a></li>
 <?php }  ?>
 
@@ -330,9 +330,11 @@ if($user_is_facility){
 		
 					$('.successreset').fadeOut(5000, function() {
     // Animation complete.
+    //$(".successreset").remove();
   });
 $('.errorlogin').fadeOut(5000, function() {
     // Animation complete.
+    //$(".successreset").remove();
   });	
 			
 	

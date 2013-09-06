@@ -36,7 +36,7 @@ function __construct() {
 			$u1 -> save();
 
 			$response = array('msg' => 'Successfull Entry.', 'response' => 'true');
-			$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
+			$this->session->set_flashdata('system_success_message', 'Success!!! .');
 			echo json_encode($response);
 
 			//$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
@@ -50,31 +50,29 @@ public function submit_stock_status() {
 		$store = $_POST['store'];
 		$quantity = $_POST['qty'];
 		$datetime = $_POST['dateofstock'];
-		//$thedate=date('y-m-d', strtotime($datetime));
-
 		
-			//$response = array('msg' => 'You have entered a wrong password.', 'response' => 'false');
-			//echo json_encode($response);
-	
-
-			$u1 = new Fp_Stocks();
-			$u1 -> fpcommodity_id = $commodity;
-			$u1 -> soh_storeqty = $quantity;
-			$u1 -> soh_storeName = $store;
-			$u1 -> date = date('y-m-d', strtotime($datetime));
+		
+			$u1 = new Pipeline();
+			$u1 -> fpcommodity_Id = $commodity;
+			$u1 -> fp_quantity = $quantity;
+			$u1 -> transaction_type = $store;
+			$u1 -> fp_date = date('y-m-d', strtotime($datetime));
 			
 			$u1 -> save();
 
 			$response = array('msg' => 'Successfull Entry.', 'response' => 'true');
-			$this->session->set_flashdata('system_success_message', 'Success!!! Your password has been changed.');
-			echo json_encode($response);
+			$this->session->set_flashdata('system_success_message', 'Success!!! .');
+			//echo json_encode($response);
+			redirect('stocks_management/pipeline');
 			}
 
 public function pipeline() {
 				//query for first graph
 
 			$con = Doctrine_Manager::getInstance() -> connection();
-			$st = $con -> execute("SELECT fpcommodities.fp_name, SUM( pipeline_management.`pending` ) / fpcommodities.projected_monthly_c AS pending, SUM( pipeline_management.`received` ) / fpcommodities.projected_monthly_c AS received, SUM( pipeline_management.`delayed` ) / fpcommodities.projected_monthly_c AS delays FROM  `pipeline_management` , fpcommodities	WHERE fpcommodities.id = pipeline_management.`fpcommodity_Id` GROUP BY fpcommodities.fp_name ");
+			$st = $con -> execute("SELECT * FROM (SELECT CASE WHEN MONTH(  `eta_details` ) >=7 THEN CONCAT( YEAR(  `eta_details` ) ,  '-', YEAR(  `eta_details` ) +1 ) 
+			ELSE CONCAT( YEAR(  `eta_details` ) -1,  '-', YEAR(  `eta_details` ) ) END AS financial_year, fpcommodities.fp_name, SUM( pipeline_management.`pending` ) / fpcommodities.projected_monthly_c AS pending, SUM( pipeline_management.`received` ) / fpcommodities.projected_monthly_c AS received, SUM( pipeline_management.`delayed` ) / fpcommodities.projected_monthly_c AS delays
+			FROM  `pipeline_management` , fpcommodities WHERE fpcommodities.id = pipeline_management.`fpcommodity_Id` GROUP BY fpcommodities.fp_name ) AS temp WHERE financial_year =  '2013-2014' ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 			$arrayfp = array();
 			$arraypending = array();
@@ -93,13 +91,10 @@ public function pipeline() {
 			$arraypending = json_encode($arraypending);
 			$arraydelayed = json_encode($arraydelayed);
 			$arrayreceived = json_encode($arrayreceived);
-			
+			//query for second graph
 			$con = Doctrine_Manager::getInstance() -> connection();
-			$st = $con -> execute("SELECT fp_name,SUM(soh_storeqty/projected_monthly_c) as sohkemsa
-FROM  `fp_stocks` , fpcommodities
-WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` 
-AND soh_storeName='KEMSA'
-GROUP BY fpcommodities.fp_name ");
+			$st = $con -> execute("SELECT fp_name,SUM(soh_storeqty/projected_monthly_c) as sohkemsa FROM  `fp_stocks` , fpcommodities
+			WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` AND soh_storeName='KEMSA' GROUP BY fpcommodities.fp_name ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 			$arrayfpkemsa = array();
 			$arraysohkemsa = array();
@@ -114,10 +109,7 @@ GROUP BY fpcommodities.fp_name ");
 			
 			$con = Doctrine_Manager::getInstance() -> connection();
 			$st = $con -> execute("SELECT fp_name,SUM(soh_storeqty/projected_monthly_c) as sohpsi
-FROM  `fp_stocks` , fpcommodities
-WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` 
-AND soh_storeName='PSI'
-GROUP BY fpcommodities.fp_name ");
+			FROM  `fp_stocks` , fpcommodities WHERE fpcommodities.id = fp_stocks.`fpcommodity_Id` AND soh_storeName='PSI' GROUP BY fpcommodities.fp_name ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 			$arrayfppsi = array();
 			$arraysohpsi = array();
@@ -130,17 +122,9 @@ GROUP BY fpcommodities.fp_name ");
 			$arrayfppsi = json_encode($arrayfppsi);
 			$arraysohpsi = json_encode($arraysohpsi);
 			$con = Doctrine_Manager::getInstance() -> connection();
-			$st = $con -> execute("SELECT * FROM (SELECT CASE 
-WHEN MONTH( fp_stocks.date ) >=7
-THEN CONCAT( YEAR( fp_stocks.date ) ,  '-', YEAR( fp_stocks.date ) +1 ) 
-ELSE CONCAT( YEAR( fp_stocks.date ) -1,  '-', YEAR( fp_stocks.date ) ) 
-END AS financial_year, SUM( soh_storeqty / projected_monthly_c ) AS sohkemsa, MONTHNAME( fp_stocks.date ) AS monthname
-FROM fp_stocks, fpcommodities
-WHERE soh_storeName =  'KEMSA'
-AND fpcommodities.id =3
-GROUP BY MONTH( fp_stocks.date )
-) AS temp
-WHERE financial_year =  '2013-2014' ");
+			$st = $con -> execute("SELECT * FROM ( SELECT CASE WHEN MONTH(  `date` ) >=7 THEN CONCAT( YEAR( `date` ) ,  '-', YEAR( `date` ) +1 ) ELSE CONCAT( YEAR( `date` ) -1,  '-', YEAR( `date` ) ) 
+			END AS financial_year, SUM(  `soh_storeqty` ) / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` FROM fp_stocks, fpcommodities WHERE  `fpcommodity_Id` =3
+			AND fpcommodities.id = fp_stocks.`fpcommodity_Id` GROUP BY MONTH( fp_stocks.`date` )) AS temp WHERE financial_year =  '2013-2014' ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 			
 			$arrayactual = array();
@@ -152,23 +136,94 @@ WHERE financial_year =  '2013-2014' ");
 
 			
 			//create array to carry months
+	//$montharray = array(
+	//7 => 'July',8 => 'August',9 => 'September',	10 => 'October',11 => 'November',12 => 'December',1 => 'January',2 => 'Febuary',3 => 'March',4 => 'April',5 => 'May',6 => 'June');
+	
+		// $montharray = json_encode($mymontharray);
+	//exit;
+	//var_dump($arraytograph);
+			
+			$arrayactual = json_encode($arrayactual);
+			$data['title'] = "Pipeline";
+			$data['content_view'] = "pipeline_home_v";
+			$data['banner_text'] = "Pipeline Management";
+			//$data['arrayto_graph'] = $arrayto_graph;
+			$data['arrayactual'] = $arrayactual;
+			//$data['montharray'] = $montharray;
+			$data['arrayfp'] = $arrayfp;
+			$data['arraypending'] = $arraypending;
+			
+			$data['arrayfpkemsa'] = $arrayfpkemsa;
+			$data['arraysohkemsa'] = $arraysohkemsa;
+			$data['arrayfppsi'] = $arrayfppsi;
+			$data['arraysohpsi'] = $arraysohpsi;
+			
+			$data['arraydelayed'] = $arraydelayed;
+			$data['arrayreceived'] = $arrayreceived;
+			$data['supplyplan'] =Pipeline_management::get_supplyplan();
+			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+			$data['fundingsource'] = Funding_source::getAllfpfundingsources();
+			$this -> load -> view("template", $data);
+			}
+
+
+public function editSupply_plan()
+{
+	
+			$data['content_view'] = "edit_supplyplan_v";
+			$data['title'] = "Edit Supply Plan";
+			$data['banner_text'] = "Edit Supply Plan";
+			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+			$data['supplyplan'] =Pipeline_management::get_supplyplan();
+			$this -> load -> view("template", $data);
+			
+}
+
+public function Supply_plan_vs_actual()
+{
+	
+			$data['content_view'] = "supplyplan_vs_actual";
+			$data['title'] = "Supply Plan Vs Actual";
+			$data['banner_text'] = "Supply Plan Vs Actual";
+			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+			$data['supplyplan'] =Pipeline_management::get_supplyplan();
+			$this -> load -> view("template", $data);
+			
+}
+
+	
+	
+public function supply_plan_filtered()
+	{
+		
+		$commodity=$_POST['commoditychange'];
+	//create array to carry months
+	$con = Doctrine_Manager::getInstance() -> connection();
+	$st = $con -> execute("SELECT * FROM (
+SELECT CASE 
+WHEN MONTH(  `date` ) >=7
+THEN CONCAT( YEAR( `date` ) ,  '-', YEAR( `date` ) +1 ) 
+ELSE CONCAT( YEAR( `date` ) -1,  '-', YEAR( `date` ) ) 
+END AS financial_year, SUM(  `soh_storeqty` ) / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id`
+FROM fp_stocks, fpcommodities
+WHERE  `fpcommodity_Id` =$commodity
+AND fpcommodities.id = fp_stocks.`fpcommodity_Id` 
+GROUP BY MONTH( fp_stocks.`date` )
+) AS temp
+WHERE financial_year =  '2013-2014' ");
+			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+			
+			$arrayactual = array();
+			foreach ($result as $value) {
+
+			$arrayactual[] = (double)$value['sohkemsa'];
+			
+			}
 	$montharray = array(
-	7 => 'July',8 => 'August',9 => 'September',	10 => 'October',11 => 'November',12 => 'December',1 => 'January',2 => 'Febuary',3 => 'March',4 => 'April',5 => 'May',6 => 'June');
+	7 => 'July',	8 => 'August',	9 => 'September',	10 => 'October',	11 => 'November',	12 => 'December',1 => 'January',	2 => 'Febuary',	3 => 'March',	4 => 'April',	5 => 'May',	6 => 'June'	);
 	//query db for data
 	$con = Doctrine_Manager::getInstance() -> connection();
-	$st = $con -> execute("SELECT *
-	FROM (	SELECT CASE
-	WHEN MONTH( eta_details ) >=7
-	THEN CONCAT( YEAR( eta_details ) ,  '-', YEAR( eta_details ) +1 )
-	ELSE CONCAT( YEAR( eta_details ) -1,  '-', YEAR( eta_details ) )
-	END AS financial_year,  `pending`/fpcommodities.projected_monthly_c AS pending ,  `fpcommodity_Id` , MONTHNAME( eta_details ) AS monthname, MONTH( eta_details ) AS monthno, YEAR( eta_details ) AS yearname
-	FROM pipeline_management,fpcommodities
-	WHERE  `fpcommodity_Id` =3
-	AND  fpcommodities.id = pipeline_management.`fpcommodity_Id`
-	) AS temp
-	WHERE financial_year =  '2013-2014'
-
-	");
+	$st = $con -> execute("SELECT *	FROM (	SELECT CASE	WHEN MONTH( eta_details ) >=7 THEN CONCAT( YEAR( eta_details ) ,  '-', YEAR( eta_details ) +1 )	ELSE CONCAT( YEAR( eta_details ) -1,  '-', YEAR( eta_details ) ) END AS financial_year,  `pending`/fpcommodities.projected_monthly_c AS pending ,  `fpcommodity_Id` , MONTHNAME( eta_details ) AS monthname, MONTH( eta_details ) AS monthno, YEAR( eta_details ) AS yearname FROM pipeline_management,fpcommodities WHERE  `fpcommodity_Id` =$commodity AND  fpcommodities.id = pipeline_management.`fpcommodity_Id`) AS temp	WHERE financial_year =  '2013-2014'	");
 	//sanitize for use in array
 	$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 	//arrays to hold separate values
@@ -199,7 +254,8 @@ WHERE financial_year =  '2013-2014' ");
 	foreach ($arrayfinal as $key => $value) {
 	$for_calculate[]=$arrayfinal[$key];
 	}
-		for ($i=0; $i <11 ;) { 
+	
+	for ($i=0; $i <11 ;) { 
 		
 	
 	foreach ($for_calculate as $key => $value) {
@@ -368,81 +424,35 @@ WHERE financial_year =  '2013-2014' ");
 			$arrayto_graph[] = $arraytograph[$key];
 			
 			}
-		$arrayto_graph = json_encode($arrayto_graph);
-		
-		$mymontharray=array();
+			$mymontharray=array();
 		foreach ($montharray as $key => $value ) {
 			$mymontharray[]=$montharray[$key];
 		}
 		 $montharray = json_encode($mymontharray);
-	//exit;
-	//var_dump($arraytograph);
-			
-			$arrayactual = json_encode($arrayactual);
-			$data['title'] = "Pipeline";
-			$data['content_view'] = "pipeline_home_v";
-			$data['banner_text'] = "Pipeline Management";
-			$data['arrayto_graph'] = $arrayto_graph;
-			$data['arrayactual'] = $arrayactual;
-			$data['montharray'] = $montharray;
-			$data['arrayfp'] = $arrayfp;
-			$data['arraypending'] = $arraypending;
-			
-			$data['arrayfpkemsa'] = $arrayfpkemsa;
-			$data['arraysohkemsa'] = $arraysohkemsa;
-			$data['arrayfppsi'] = $arrayfppsi;
-			$data['arraysohpsi'] = $arraysohpsi;
-			
-			$data['arraydelayed'] = $arraydelayed;
-			$data['arrayreceived'] = $arrayreceived;
-			$data['supplyplan'] =Pipeline_management::get_supplyplan();
-			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-			$data['fundingsource'] = Funding_source::getAllfpfundingsources();
-			$this -> load -> view("template", $data);
-			}
+		$arrayto_graph = json_encode($arrayto_graph);
+		$arrayactual = json_encode($arrayactual);
+		$data['arrayto_graph'] = $arrayto_graph;
+		$data['arrayactual'] = $arrayactual;
+		$data['montharray'] = $montharray;
+		//$data['content_view'] = "supply_plan_v";
+		//$data['banner_text'] = "charts";
 
-
-public function editSupply_plan()
-{
-	
-			$data['content_view'] = "edit_supplyplan_v";
-			$data['title'] = "Edit Supply Plan";
-			$data['banner_text'] = "Edit Supply Plan";
-			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-			$data['supplyplan'] =Pipeline_management::get_supplyplan();
-			$this -> load -> view("template", $data);
-			
-}
-
-public function Supply_plan_vs_actual()
-{
-	
-			$data['content_view'] = "supplyplan_vs_actual";
-			$data['title'] = "Supply Plan Vs Actual";
-			$data['banner_text'] = "Supply Plan Vs Actual";
-			$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-			$data['supplyplan'] =Pipeline_management::get_supplyplan();
-			$this -> load -> view("template", $data);
-			
-}
-
-	
-	
-public function supply_plan_filtered()
-	{
+		$this -> load -> view("supply_plan_v", $data);
+	}
+public function supply_plan_default()
+	{		
 		
-		$commodity=$_POST['commoditychange'];
 	//create array to carry months
 	$con = Doctrine_Manager::getInstance() -> connection();
-	$st = $con -> execute("SELECT * FROM (SELECT CASE 
-WHEN MONTH( fp_stocks.date ) >=7
-THEN CONCAT( YEAR( fp_stocks.date ) ,  '-', YEAR( fp_stocks.date ) +1 ) 
-ELSE CONCAT( YEAR( fp_stocks.date ) -1,  '-', YEAR( fp_stocks.date ) ) 
-END AS financial_year, SUM( soh_storeqty / projected_monthly_c ) AS sohkemsa, MONTHNAME( fp_stocks.date ) AS monthname
+	$st = $con -> execute("SELECT * FROM (
+SELECT CASE WHEN MONTH(  `date` ) >=7
+THEN CONCAT( YEAR( `date` ) ,  '-', YEAR( `date` ) +1 ) 
+ELSE CONCAT( YEAR( `date` ) -1,  '-', YEAR( `date` ) ) 
+END AS financial_year, SUM(  `soh_storeqty` ) / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id`
 FROM fp_stocks, fpcommodities
-WHERE soh_storeName =  'KEMSA'
-AND fpcommodities.id =$commodity
-GROUP BY MONTH( fp_stocks.date )
+WHERE  `fpcommodity_Id` =3
+AND fpcommodities.id = fp_stocks.`fpcommodity_Id` 
+GROUP BY MONTH( fp_stocks.`date` )
 ) AS temp
 WHERE financial_year =  '2013-2014' ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
@@ -457,7 +467,7 @@ WHERE financial_year =  '2013-2014' ");
 	7 => 'July',	8 => 'August',	9 => 'September',	10 => 'October',	11 => 'November',	12 => 'December',1 => 'January',	2 => 'Febuary',	3 => 'March',	4 => 'April',	5 => 'May',	6 => 'June'	);
 	//query db for data
 	$con = Doctrine_Manager::getInstance() -> connection();
-	$st = $con -> execute("SELECT *	FROM (	SELECT CASE	WHEN MONTH( eta_details ) >=7 THEN CONCAT( YEAR( eta_details ) ,  '-', YEAR( eta_details ) +1 )	ELSE CONCAT( YEAR( eta_details ) -1,  '-', YEAR( eta_details ) ) END AS financial_year,  `pending`/fpcommodities.projected_monthly_c AS pending ,  `fpcommodity_Id` , MONTHNAME( eta_details ) AS monthname, MONTH( eta_details ) AS monthno, YEAR( eta_details ) AS yearname FROM pipeline_management,fpcommodities WHERE  `fpcommodity_Id` =$commodity AND  fpcommodities.id = pipeline_management.`fpcommodity_Id`) AS temp	WHERE financial_year =  '2013-2014'	");
+	$st = $con -> execute("SELECT *	FROM (	SELECT CASE	WHEN MONTH( eta_details ) >=7 THEN CONCAT( YEAR( eta_details ) ,  '-', YEAR( eta_details ) +1 )	ELSE CONCAT( YEAR( eta_details ) -1,  '-', YEAR( eta_details ) ) END AS financial_year,  `pending`/fpcommodities.projected_monthly_c AS pending ,  `fpcommodity_Id` , MONTHNAME( eta_details ) AS monthname, MONTH( eta_details ) AS monthno, YEAR( eta_details ) AS yearname FROM pipeline_management,fpcommodities WHERE  `fpcommodity_Id` =3 AND  fpcommodities.id = pipeline_management.`fpcommodity_Id`) AS temp	WHERE financial_year =  '2013-2014'	");
 	//sanitize for use in array
 	$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 	//arrays to hold separate values

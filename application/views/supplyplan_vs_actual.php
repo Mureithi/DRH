@@ -109,7 +109,7 @@ $(document).ready(function() {
 </script>
 <div class="sub-menu">
 
-    <a class="btn btn-primary " href="<?php echo base_url(); ?>stocks_management/editSupply_plan">Edit Supply Plan</a>   
+    <a class="btn btn-primary " href="<?php echo base_url(); ?>Fp_management/editSupply_plan">Edit Supply Plan</a>   
                           
             </div>
             <div class="graph">
