@@ -36,6 +36,32 @@ class Fp_management extends MY_Controller {
 		
 
 	}
+	public function update_transaction() {
+		$action=$_POST['action'];	
+		$trid=$_POST['trid'];		
+	    $Receive=$_POST['Receive'];
+		$qtyReceive=$_POST['qtyReceive'];
+		$delay=$_POST['delay'];
+		$comment=$_POST['comment'];
+		$receivedate=date('y-m-d',strtotime($Receive));
+		$delaydate=date('y-m-d',strtotime($delay));
+		
+		if ($action==1) {
+			$updateaction='INCOUNTRY';
+			
+		}elseif ($action==2) {
+			$updateaction='DELAYED';
+		}
+		
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` =  $qtyReceive,
+		`transaction_type`='$updateaction' ,`delay_to` =  '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` =$trid; ");
+		
+			
+		$this->session->set_flashdata('system_success_message', "Transaction Updated");
+		redirect('fp_management/editSupply_plan');
+
+	}
 	
 	public function Supply_plan() {
 
@@ -245,7 +271,7 @@ WHERE financial_year =   '$f_year'");
 
 		//clean the combined array
 		$basket = array_replace($montharray, $arraycombined);
-
+		unset($arraycombined);
 		//loop through to replace string values in array with int
 		foreach ($basket as $key => $val) {
 			if (is_string($val)) {
@@ -462,7 +488,7 @@ WHERE financial_year =  '2013-2014'
 GROUP BY monthn ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 
-		$monthnos = array();
+		$monthnos =  array();
 		$actual = array();
 		foreach ($result as $value) {
 
@@ -472,12 +498,12 @@ GROUP BY monthn ");
 		}
 		//query db for data
 		//combine data for corespondence, ie map months with respective values
-		$arraycombined = array();
-		$arraycombined = array_combine($monthnos, $actual);
-
+		//$arraycombined = array();
+		$combined = array_combine($monthnos, $actual);
+		
 		//clean the combined array
-		$basket = array();
-		$basket = array_replace($montharray, $arraycombined);
+		//$basket = array();
+		$basket = array_replace($montharray, $combined);
 
 		//loop through to replace string values in array with int
 		foreach ($basket as $key => $val) {
@@ -490,7 +516,7 @@ GROUP BY monthn ");
 		foreach ($basket as $key => $val) {
 			$actualbasket[] = $basket[$key];
 		}
-		
+		unset($combined);
 		//var_dump($actualbasket);
 		//exit;
 		

@@ -30,6 +30,9 @@
 	}
 	
 </style>
+<?php 
+    $att=array("name"=>'','id'=>'',"class"=>'form-horizontal');
+	 echo form_open('Fp_management/update_transaction',$att); ?>
   <div class="sub-menu">
   		<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/editSupply_plan">Back</a>
             </div>
@@ -43,9 +46,12 @@
   	<div class="form-horizontal" style=" margin-left:24%; ">
   <div class="control-group" style=" margin-top:2em; ">
     <label class="control-label" for="FpCommodity">Fp Commodity</label>
-    <div class="controls">
-      <input type="text" readonly="readonly" id="FpCommodity" value="<?php echo $val['fp_name'];?>">
-    </div>
+    
+    <div class="controls controls-row" id="" >
+              <input class="span2" type="text" readonly="readonly" id="FpCommodity" value="<?php echo $val['fp_name'];?>">
+              <input class="span2" type="text" readonly="readonly" id="FpCommodityid" value="<?php echo $val['Unit'];?>">
+              <input type="hidden" readonly="readonly" id="trid" name="trid" value="<?php echo $val['tr_id'];?>">
+            </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="FSource">Funding Source</label>
@@ -68,7 +74,7 @@
   <div class="control-group">
     <label class="control-label" for="Dateexp">Action</label>
     <div class="controls">
-      <select id="action">
+      <select id="action" name="action">
       	<option value="0">Select Action</option>
       	<option value="1">Receive</option>
       	<option value="2">Delay</option>
@@ -76,24 +82,28 @@
     </div>
   </div>
   <div class="controls controls-row" id="actionreceive" style=" margin-bottom:1em; ">
-              <input class="span2" type="text" placeholder="Date Received" id="Receive">
-              <input class="span2" type="text" placeholder="Quantity Received">
+              <input class="span2" type="text" placeholder="Date Received" id="Receive" name="Receive">
+              <input class="span2" type="text" placeholder="Quantity Received" id="qtyReceive" name="qtyReceive">
             </div>
             
   <div class="controls controls-row" style="margin-top:1em; margin-bottom:1em; " id="actiondelay">
-              <input class="span2" type="text" placeholder="Date delayed to" id="delay">
-              <input class="span3" type="text" placeholder="Comment">
+              <input class="span2" type="text" placeholder="Date delayed to" id="delay" name="delay">
+              <input class="span3" type="text" placeholder="Comment" id="comment" name="comment">
             </div>
             
            <div class="form-actions">
   <button type="submit" class="btn btn-primary">Save changes</button>
-  <button type="button" class="btn">Cancel</button>
+  
 </div>
   
 </div>
 
   </div>
-<?php }?>	 
+<?php }
+echo form_close();
+?>
+
+	 
   <script>
   	$(document).ready(function() {
 	$(function() {

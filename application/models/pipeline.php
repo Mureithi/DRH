@@ -32,7 +32,8 @@ class Pipeline extends Doctrine_Record {
 	public static function getAll_edit($trid)
 	{
 		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
-		->fetchAll("SELECT * FROM  `pipeline` , fpcommodities,funding_sources WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND funding_sources.id = pipeline.`funding_source` AND pipeline.id=$trid ");
+		->fetchAll("SELECT pipeline.id AS tr_id, fp_name, fp_quantity, Unit, funding_sources.funding_source,fp_date, projected_monthly_c
+FROM  `pipeline` , fpcommodities, funding_sources WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND funding_sources.id = pipeline.`funding_source` AND pipeline.id =$trid");
 
         return $supplyplan ;
 	} 

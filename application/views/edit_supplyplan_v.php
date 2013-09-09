@@ -134,7 +134,7 @@
 }
 
  	$('.Editable').click(function() {
-          alert($(this).attr('id'));
+          alert("You are about to edit this field,Proceed?");
          	var trid=$(this).attr('id');
 			window.location="<?php echo base_url();?>fp_management/edit_transaction/"+encodeURIComponent(trid);
 		
