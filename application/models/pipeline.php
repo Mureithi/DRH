@@ -43,7 +43,7 @@ FROM  `pipeline` , fpcommodities, funding_sources WHERE pipeline.`fpcommodity_Id
      
 		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
 		->fetchAll("SELECT * 
-FROM ( SELECT DISTINCT fpcommodities.fp_name, pipeline.id AS tr_id, fpcommodities.Unit, funding_sources.`funding_source` ,  `fp_date` ,  `fp_quantity` , 
+FROM ( SELECT DISTINCT fpcommodities.fp_name, pipeline.id AS tr_id, fpcommodities.Unit, funding_sources.`funding_source` ,  `fp_date` ,  `fp_quantity` ,  `transaction_type` ,`date_receive` ,`delay_to`,
 CASE WHEN MONTH( fp_date ) >=7
 THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
 ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
@@ -51,7 +51,6 @@ END AS financial_year
 FROM pipeline, fpcommodities, funding_sources
 WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
 AND funding_sources.id = pipeline.`funding_source`
-AND `transaction_type`='PENDINGKEMSA'
 ) AS temp
 WHERE financial_year =  '2013-2014'  ");
 

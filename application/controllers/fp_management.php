@@ -50,12 +50,13 @@ class Fp_management extends MY_Controller {
 			$updateaction='INCOUNTRY';
 			
 		}elseif ($action==2) {
-			$updateaction='DELAYED';
+			 $updateaction='DELAYED';
+			
 		}
 		
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` =  $qtyReceive,
-		`transaction_type`='$updateaction' ,`delay_to` =  '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` =$trid; ");
+		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` = $qtyReceive,
+		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` =$trid; ");
 		
 			
 		$this->session->set_flashdata('system_success_message', "Transaction Updated");
@@ -209,7 +210,10 @@ ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) )
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND  `transaction_type` =  'SOHKEMSA'
+AND  (
+`transaction_type` =  'SOHKEMSA'
+OR  `transaction_type` =  'INCOUNTRY'
+)
 AND  `fpcommodity_Id` =$commodity
 ) AS temp
 WHERE financial_year = '$f_year'
@@ -253,7 +257,10 @@ END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pen
 FROM pipeline, fpcommodities
 WHERE  `fpcommodity_Id` =$commodity
 AND fpcommodities.id = pipeline.`fpcommodity_Id` 
-AND  `transaction_type` =  'PENDINGKEMSA'
+AND  (
+`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED'
+)
 ) AS temp
 WHERE financial_year =   '$f_year'");
 		//sanitize for use in array
@@ -470,9 +477,10 @@ WHERE financial_year =   '$f_year'");
 	}
 
 	public function supply_plan_default() {
+				//create array to carry months
+		
 		$montharray = array('7' => 'July', '8' => 'August', '9' => 'September', '10' => 'October', '11' => 'November', '12' => 'December', '1' => 'January', '2' => 'Febuary', '3' => 'March', '4'=> 'April', '5' => 'May', '6'=> 'June');
 
-		//create array to carry months
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year
 FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
@@ -481,7 +489,10 @@ ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) )
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND  `transaction_type` =  'SOHKEMSA'
+AND (
+`transaction_type` =  'SOHKEMSA'
+OR  `transaction_type` =  'INCOUNTRY'
+)
 AND  `fpcommodity_Id` =10
 ) AS temp
 WHERE financial_year =  '2013-2014'
@@ -529,7 +540,10 @@ END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pen
 FROM pipeline, fpcommodities
 WHERE  `fpcommodity_Id` =10
 AND fpcommodities.id = pipeline.`fpcommodity_Id` 
-AND  `transaction_type` =  'PENDINGKEMSA'
+AND  (
+`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED'
+)
 ) AS temp
 WHERE financial_year =  '2013-2014'	");
 		//sanitize for use in array
@@ -765,7 +779,10 @@ ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) )
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` 
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND  `transaction_type` =  'SOHKEMSA'
+AND  (
+`transaction_type` =  'SOHKEMSA'
+OR  `transaction_type` =  'INCOUNTRY'
+)
 ) AS temp
 WHERE financial_year =  '2013-2014'
 GROUP BY temp.fpcommodity_Id ");
@@ -878,8 +895,8 @@ GROUP BY temp.fpcommodity_Id ");
 		$st = $con -> execute("SELECT * FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
 					THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
 					END AS financial_year, SUM(  `fp_quantity` ) / fpcommodities.projected_monthly_c AS sohpending,  `fpcommodity_Id` 
-					FROM pipeline, fpcommodities WHERE fpcommodities.id = pipeline.`fpcommodity_Id` AND  `transaction_type` = 'PENDINGKEMSA' GROUP BY fpcommodity_Id ) AS temp
-					WHERE financial_year =  '2013-2014' ");
+					FROM pipeline, fpcommodities WHERE fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA' OR  `transaction_type` =  'DELAYED'
+					) GROUP BY fpcommodity_Id ) AS temp	WHERE financial_year =  '2013-2014' ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp = array();
 		$arraypending = array();

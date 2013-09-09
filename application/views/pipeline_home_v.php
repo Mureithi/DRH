@@ -175,6 +175,8 @@
 		<th>Unit</th>
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
+		<th>Date Received</th>
+		<th>Date Delayed</th>
 		<th>Quantity</th>
 		<th>Status</th>
 		
@@ -191,8 +193,27 @@
 							<td><?php echo $val['Unit'];?></td>
 							<td><?php echo $val['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
+							<td><?php if ($val['date_receive']=='0000-00-00'||$val['date_receive']=='1970-01-01') {
+								echo '-';
+							} else {
+								echo date('F j, Y ', strtotime($val['date_receive']));
+							}
+							 ?></td>
+							<td><?php if ($val['delay_to']=='0000-00-00'||$val['delay_to']=='1970-01-01') {
+								echo '-';
+							} else {
+								echo date('F j, Y ', strtotime($val['delay_to']));
+							}
+							 ?></td>
 							<td><?php echo number_format($val['fp_quantity']);?></td>
-							<td><button class="btn btn-warning" id="" name="" >Pending</button></td>
+							<td><?php if ($val['transaction_type']=='PENDINGKEMSA') {
+								echo '<button class="btn btn-mini btn-warning" id="" name="" >Pending</button>';
+							} elseif($val['transaction_type']=='INCOUNTRY') {
+								echo '<button class="btn btn-mini btn-success" id="" name="" >Received</button>';
+							}else {
+								echo '<button class="btn btn-mini btn-danger" id="" name="" >Delayed</button>';
+							}
+							 ?></td>
 							
 					   </tr>
 					   
