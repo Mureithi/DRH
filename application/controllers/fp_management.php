@@ -4,7 +4,7 @@ class Fp_management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> helper(array('form', 'url'));
-		ini_set("max_execution_time", "1000000");
+		//ini_set("max_execution_time", "10000000");
 		
 	}
 
@@ -259,7 +259,7 @@ WHERE  `fpcommodity_Id` =$commodity
 AND fpcommodities.id = pipeline.`fpcommodity_Id` 
 AND  (
 `transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED'
+OR  `transaction_type` =  'DELAYED'  OR  `transaction_type` =  'INCOUNTRY'
 )
 ) AS temp
 WHERE financial_year =   '$f_year'");
@@ -510,8 +510,16 @@ GROUP BY monthn ");
 		//query db for data
 		//combine data for corespondence, ie map months with respective values
 		//$arraycombined = array();
+		$cars = array
+   ( $monthnos, $actual );
+  // var_dump($cars);
+  // var_dump($cars[0][0]);
+  // exit;
 		$combined = array_combine($monthnos, $actual);
-		
+		//var_dump($monthnos);
+		//var_dump($actual);
+		//var_dump($combined);
+		//exit;
 		//clean the combined array
 		//$basket = array();
 		$basket = array_replace($montharray, $combined);
@@ -542,7 +550,7 @@ WHERE  `fpcommodity_Id` =10
 AND fpcommodities.id = pipeline.`fpcommodity_Id` 
 AND  (
 `transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED'
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY'
 )
 ) AS temp
 WHERE financial_year =  '2013-2014'	");
