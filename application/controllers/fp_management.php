@@ -4,7 +4,9 @@ class Fp_management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> helper(array('form', 'url'));
-		//ini_set("max_execution_time", "10000000");
+		ini_set("max_execution_time", "1000000");
+		//ini_set("upload_max_filesize", "500000000");
+		ini_set("memory_limit", '2048M');
 		
 	}
 
@@ -95,8 +97,6 @@ class Fp_management extends MY_Controller {
 		$data['banner_text'] = "Edit Supply Plan";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline::get_supply_plan();
-		//$data= Pipeline::get_supply_plan();
-		//var_export($data);
 		$this -> load -> view("template", $data);
 
 	}
@@ -112,6 +112,43 @@ class Fp_management extends MY_Controller {
 		$this -> load -> view("ajax_view/filtered_plan", $data);
 
 	}
+public function soh_detailed() {
+	   
+		$year_from=date('Y');;		
+	    $month=date('n');
+		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month);
+		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month));
+		if ($mycount==0) {
+			echo "<div>No Record</>";
+		} elseif($mycount>0) {
+		$data['content_view'] = "soh_detailed";
+		$data['title'] = "SOH";
+		$data['banner_text'] = "SOH Detailed";
+		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+		$data['supplyplan'] = Pipeline::get_supply_plan();
+		$this -> load -> view("template", $data);	
+		}
+		
+		
+
+	}
+
+public function soh_filtered() {
+
+		$year_from=$_POST['year_from'];		
+	    $month=$_POST['month'];
+		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month);
+		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month));
+		
+		if ($mycount==0) {
+			echo "<div style='margin-left:50%;margin-top:5%;font-size:18px'>No Record for $month $year_from</>";
+		} elseif($mycount>0) {
+		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+		$data['supplyplan'] = Pipeline::get_supply_plan();
+		$this -> load -> view("ajax_view/filter_soh", $data);
+
+	}
+}
 
 	public function Supply_plan_vs_actual() {
 
@@ -194,335 +231,81 @@ class Fp_management extends MY_Controller {
 		
 		
 	}
+	public function settings_home() {
+
+		
+		$data['title'] = "Settings";
+		$data['content_view'] = "settings_home_v";
+		$data['banner_text'] = "Settings";
+		$data['kemsa_psi'] = Pipeline::kemsa_psi();
+		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+		$data['supplyplan'] = Pipeline::get_supply_plan();
+		$data['fundingsource'] = Funding_source::getAllfpfundingsources();
+		$this -> load -> view("template", $data);
+	}
 	
 
-	public function supply_plan_filtered() {
-		$montharray = array(7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December', 1 => 'January', 2 => 'Febuary', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June');
-
-		$commodity = $_POST['commoditychange'];
-		$f_year = $_POST['financeyear'];
-		//create array to carry months
-		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT fpcommodity_Id, SUM(sohkemsa) as sohkemsa, monthn, financial_year
-FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
-THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
-ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
-END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn
-FROM pipeline, fpcommodities
-WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND  (
-`transaction_type` =  'SOHKEMSA'
-OR  `transaction_type` =  'INCOUNTRY'
-)
-AND  `fpcommodity_Id` =$commodity
-) AS temp
-WHERE financial_year = '$f_year'
-GROUP BY monthn
- ");
-		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
-
-		$monthnos = array();
-		$actual = array();
-		foreach ($result as $value) {
-
-			$monthnos[] = $value['monthn'];
-			$actual[] = (double)$value['sohkemsa'];
-
-		}
-		//query db for data
-		//combine data for corespondence, ie map months with respective values
-		$arraycombined = array_combine($monthnos, $actual);
-
-		//clean the combined array
-		$basket = array_replace($montharray, $arraycombined);
-
-		//loop through to replace string values in array with int
-		foreach ($basket as $key => $val) {
-			if (is_string($val)) {
-				$basket[$key] = 0;
-			}
-
-		}
-		$actualbasket = array();
-		foreach ($basket as $key => $val) {
-			$actualbasket[] = $basket[$key];
-		}
-		//query db for data
-		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT * 
-FROM ( SELECT CASE WHEN MONTH( fp_date ) >=7
-THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
-ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
-END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
-FROM pipeline, fpcommodities
-WHERE  `fpcommodity_Id` =$commodity
-AND fpcommodities.id = pipeline.`fpcommodity_Id` 
-AND  (
-`transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED'  OR  `transaction_type` =  'INCOUNTRY'
-)
-) AS temp
-WHERE financial_year =   '$f_year'");
-		//sanitize for use in array
-		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
-		//arrays to hold separate values
-		$monthno = array();
-		$pend = array();
-		//populate arrays
-		foreach ($result as $value) {
-			$monthno[] = $value['monthno'];
-			$pend[] = (double)$value['pending'];
-		}
-		//combine data for corespondence, ie map months with respective values
-		$arraycombined = array_combine($monthno, $pend);
-
-		//clean the combined array
-		$basket = array_replace($montharray, $arraycombined);
-		unset($arraycombined);
-		//loop through to replace string values in array with int
-		foreach ($basket as $key => $val) {
-			if (is_string($val)) {
-				$basket[$key] = 0;
-			}
-
-		}
-		$arrayfinal = array_combine($montharray, $basket);
-
-		$for_calculate = array();
-		foreach ($arrayfinal as $key => $value) {
-			$for_calculate[] = $arrayfinal[$key];
-		}
-
-		for ($i = 0; $i < 11; ) {
-
-			foreach ($for_calculate as $key => $value) {
-				//check for the 1st index
-
-				if ($i == 0) {
-					if ($for_calculate[$i] == 0) {
-						$for_calculate[$key] = $actualbasket[0];
-
-					}
-				}
-
-				//clean rest of the array
-				if ($i == 1) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[0] - 1 < 0) {
-							$for_calculate[1] = 0;
-						} else {
-							$for_calculate[1] = $for_calculate[0] - 1;
-						}
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[1] = $for_calculate[0] + $for_calculate[1];
-					}
-				}
-				if ($i == 2) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[1] - 1 < 0) {
-							$for_calculate[2] = 0;
-						} else {
-							$for_calculate[2] = $for_calculate[1] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[2] = $for_calculate[1] + $for_calculate[2];
-					}
-				}
-				if ($i == 3) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[2] - 1 < 0) {
-							$for_calculate[3] = 0;
-						} else {
-							$for_calculate[3] = $for_calculate[2] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[3] = $for_calculate[3] + $for_calculate[2];
-					}
-				}
-				if ($i == 4) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[3] - 1 < 0) {
-							$for_calculate[4] = 0;
-						} else {
-							$for_calculate[4] = $for_calculate[3] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[4] = $for_calculate[4] + $for_calculate[3];
-					}
-				}
-				if ($i == 5) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[4] - 1 < 0) {
-							$for_calculate[5] = 0;
-						} else {
-							$for_calculate[5] = $for_calculate[4] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[5] = $for_calculate[5] + $for_calculate[4];
-					}
-				}
-				if ($i == 6) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[5] - 1 < 0) {
-							$for_calculate[6] = 0;
-						} else {
-							$for_calculate[6] = $for_calculate[5] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[6] = $for_calculate[6] + $for_calculate[5];
-					}
-				}
-				if ($i == 7) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[6] - 1 < 0) {
-							$for_calculate[7] = 0;
-						} else {
-							$for_calculate[7] = $for_calculate[6] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[7] = $for_calculate[7] + $for_calculate[6];
-					}
-				}
-				if ($i == 8) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[7] - 1 < 0) {
-							$for_calculate[8] = 0;
-						} else {
-							$for_calculate[8] = $for_calculate[7] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[8] = $for_calculate[8] + $for_calculate[7];
-					}
-				}
-				if ($i == 9) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[8] - 1 < 0) {
-							$for_calculate[9] = 0;
-						} else {
-							$for_calculate[9] = $for_calculate[8] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[9] = $for_calculate[9] + $for_calculate[8];
-					}
-				}
-				if ($i == 10) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[9] - 1 < 0) {
-							$for_calculate[10] = 0;
-						} else {
-							$for_calculate[10] = $for_calculate[9] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[10] = $for_calculate[10] + $for_calculate[9];
-					}
-				}
-				if ($i == 11) {
-					if ($for_calculate[$i] == 0) {
-
-						if ($for_calculate[10] - 1 < 0) {
-							$for_calculate[11] = 0;
-						} else {
-							$for_calculate[11] = $for_calculate[10] - 1;
-						}
-
-					} elseif ($for_calculate[$i] > 0) {
-						$for_calculate[11] = $for_calculate[11] + $for_calculate[10];
-					}
-				}
-
-				$i++;
-
-			}
-		}
-		$arraytograph = array_combine($montharray, $for_calculate);
-		$arrayto_graph = array();
-		foreach ($arraytograph as $key => $value) {
-
-			$arrayto_graph[] = $arraytograph[$key];
-
-		}
-		$mymontharray = array();
-		foreach ($montharray as $key => $value) {
-			$mymontharray[] = $montharray[$key];
-		}
-		$montharray = json_encode($mymontharray);
-		$arrayto_graph = json_encode($arrayto_graph);
-		$arrayactual = json_encode($actualbasket);
-		$data['arrayto_graph'] = $arrayto_graph;
-		$data['arrayactual'] = $arrayactual;
-		$data['montharray'] = $montharray;
-		//$data['content_view'] = "supply_plan_v";
-		//$data['banner_text'] = "charts";
-
-		$this -> load -> view("supply_plan_v", $data);
-	}
-
+	
 	public function supply_plan_default() {
 				//create array to carry months
 		
 		$montharray = array('7' => 'July', '8' => 'August', '9' => 'September', '10' => 'October', '11' => 'November', '12' => 'December', '1' => 'January', '2' => 'Febuary', '3' => 'March', '4'=> 'April', '5' => 'May', '6'=> 'June');
-
+if ($this->input->post('financeyear') && $this->input->post('commoditychange1') && $this->input->post('commoditychange2')){
+		$f_year=$_POST['financeyear'];		
+	   $fpcommodity1=$_POST['commoditychange1'];
+	   $fpcommodity2=$_POST['commoditychange2'];
+	} else {
+	 $f_year=2013-2014;		
+	 $fpcommodity1=8;
+	 $fpcommodity2=1;
+		//exit;
+	}
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year
+		$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year, fp_name
 FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
 THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
 ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
-END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn
-FROM pipeline, fpcommodities
-WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND (
-`transaction_type` =  'SOHKEMSA'
-OR  `transaction_type` =  'INCOUNTRY'
-)
-AND  `fpcommodity_Id` =10
-) AS temp
-WHERE financial_year =  '2013-2014'
-GROUP BY monthn ");
+END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
+FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND ( `transaction_type` =  'SOHKEMSA' OR  `transaction_type` =  'INCOUNTRY')
+AND `fpcommodity_Id` ='$fpcommodity1' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
-
+		
+$st2 = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year, fp_name
+FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
+THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
+ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
+END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
+FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND ( `transaction_type` =  'SOHKEMSA' OR  `transaction_type` =  'INCOUNTRY')
+AND `fpcommodity_Id` ='$fpcommodity2' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
+		$result2 = $st2 -> fetchAll(PDO::FETCH_ASSOC);
+				
 		$monthnos =  array();
 		$actual = array();
+		$commodity = array();
 		foreach ($result as $value) {
 
 			$monthnos[] = $value['monthn'];
 			$actual[] = (double)$value['sohkemsa'];
+			$commodity[] = $value['fp_name'];
 
 		}
-		//query db for data
-		//combine data for corespondence, ie map months with respective values
-		//$arraycombined = array();
-		$cars = array
-   ( $monthnos, $actual );
-  // var_dump($cars);
-  // var_dump($cars[0][0]);
-  // exit;
+		
+		$monthnos2 =  array();
+		$actual2 = array();
+		$commodity2 = array();
+		foreach ($result2 as $value) {
+
+			$monthnos2[] = $value['monthn'];
+			$actual2[] = (double)$value['sohkemsa'];
+			$commodity2[] = $value['fp_name'];
+
+		}
+	
 		$combined = array_combine($monthnos, $actual);
-		//var_dump($monthnos);
-		//var_dump($actual);
-		//var_dump($combined);
-		//exit;
-		//clean the combined array
-		//$basket = array();
 		$basket = array_replace($montharray, $combined);
+		
+		$combined2 = array_combine($monthnos2, $actual2);
+		$basket2 = array_replace($montharray, $combined2);
 
 		//loop through to replace string values in array with int
 		foreach ($basket as $key => $val) {
@@ -536,8 +319,19 @@ GROUP BY monthn ");
 			$actualbasket[] = $basket[$key];
 		}
 		unset($combined);
-		//var_dump($actualbasket);
-		//exit;
+		
+		
+		foreach ($basket2 as $key => $val) {
+			if (is_string($val)) {
+				$basket2[$key] = 0;
+			}
+
+		}
+		$actualbasket2 = array();
+		foreach ($basket2 as $key => $val) {
+			$actualbasket2[] = $basket2[$key];
+		}
+		unset($combined2);
 		
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT * 
@@ -545,18 +339,18 @@ FROM ( SELECT CASE WHEN MONTH( fp_date ) >=7
 THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
 ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
-FROM pipeline, fpcommodities
-WHERE  `fpcommodity_Id` =10
-AND fpcommodities.id = pipeline.`fpcommodity_Id` 
-AND  (
-`transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY'
-)
-) AS temp
-WHERE financial_year =  '2013-2014'	");
+FROM pipeline, fpcommodities WHERE  `fpcommodity_Id` ='$fpcommodity1' AND fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '2013-2014'");
 		//sanitize for use in array
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		//arrays to hold separate values
+		 $st2 = $con -> execute("SELECT * FROM ( SELECT CASE WHEN MONTH( fp_date ) >=7 THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
+ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
+FROM pipeline, fpcommodities WHERE  `fpcommodity_Id` ='$fpcommodity2' AND fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '2013-2014'");
+		//sanitize for use in array
+		
+		$result2 = $st2 -> fetchAll(PDO::FETCH_ASSOC);
 		$monthno = array();
 		$pend = array();
 		//populate arrays
@@ -564,14 +358,29 @@ WHERE financial_year =  '2013-2014'	");
 			$monthno[] = $value['monthno'];
 			$pend[] = (double)$value['pending'];
 		}
+		if (count($pend)==0) {
+			$pend[]=0;
+			$monthno[]=7;
+		} 
+		
+		$monthno2 = array();
+		$pend2 = array();
+		//populate arrays
+		foreach ($result2 as $value) {
+			$monthno2[] = $value['monthno'];
+			$pend2[] = (double)$value['pending'];
+		}
+		if (count($pend2)==0) {
+			$pend2[]=0;
+			$monthno2[]=7;
+		} 
+		
 		//combine data for corespondence, ie map months with respective values
 		$arraycombined = array_combine($monthno, $pend);
-		
-		//var_dump($arraycombined);
-		//exit;
-
-		//clean the combined array
 		$basket = array_replace($montharray, $arraycombined);
+		
+		$arraycombined2 = array_combine($monthno2, $pend2);
+		$basket2 = array_replace($montharray, $arraycombined2);
 
 		//loop through to replace string values in array with int
 		foreach ($basket as $key => $val) {
@@ -580,8 +389,7 @@ WHERE financial_year =  '2013-2014'	");
 			}
 
 		}
-		//var_dump($basket);
-		//exit;
+		
 		$arrayfinal = array_combine($montharray, $basket);
 		
 		$for_calculate = array();
@@ -590,11 +398,11 @@ WHERE financial_year =  '2013-2014'	");
 		}
 		//var_dump($for_calculate);
 		//exit;
-		for ($i = 0; $i < 11; ) {
+		
 
 			foreach ($for_calculate as $key => $value) {
 				//check for the 1st index
-
+$i = 0;
 				if ($i == 0) {
 					if ($for_calculate[$i] == 0) {
 						$for_calculate[$key] = $actualbasket[0];
@@ -749,9 +557,191 @@ WHERE financial_year =  '2013-2014'	");
 				$i++;
 
 			}
+
+foreach ($basket2 as $key => $val) {
+			if (is_string($val)) {
+				$basket2[$key] = 0;
+			}
+
 		}
 		
-		$arraytograph = array_combine($montharray, $for_calculate);
+		$arrayfinal2 = array_combine($montharray, $basket2);
+		
+		$for_calculate2 = array();
+		foreach ($arrayfinal2 as $key => $value) {
+			$for_calculate2[] = $arrayfinal2[$key];
+		}
+		//var_dump($for_calculate);
+		//exit;
+		
+
+			foreach ($for_calculate2 as $key => $value) {
+				//check for the 1st index
+$j = 0;
+				if ($j == 0) {
+					if ($for_calculate2[$j] == 0) {
+						$for_calculate2[$key] = $actualbasket2[0];
+
+					}
+				}
+
+				//clean rest of the array
+				if ($j == 1) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[0] - 1 < 0) {
+							$for_calculate2[1] = 0;
+						} else {
+							$for_calculate2[1] = $for_calculate2[0] - 1;
+						}
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[1] = $for_calculate2[0] + $for_calculate2[1];
+					}
+				}
+				if ($j == 2) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[1] - 1 < 0) {
+							$for_calculate2[2] = 0;
+						} else {
+							$for_calculate2[2] = $for_calculate2[1] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[2] = $for_calculate2[1] + $for_calculate2[2];
+					}
+				}
+				if ($j == 3) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[2] - 1 < 0) {
+							$for_calculate2[3] = 0;
+						} else {
+							$for_calculate2[3] = $for_calculate2[2] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[3] = $for_calculate2[3] + $for_calculate2[2];
+					}
+				}
+				if ($j == 4) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[3] - 1 < 0) {
+							$for_calculate2[4] = 0;
+						} else {
+							$for_calculate2[4] = $for_calculate2[3] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[4] = $for_calculate2[4] + $for_calculate2[3];
+					}
+				}
+				if ($j == 5) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[4] - 1 < 0) {
+							$for_calculate2[5] = 0;
+						} else {
+							$for_calculate2[5] = $for_calculate2[4] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[5] = $for_calculate2[5] + $for_calculate2[4];
+					}
+				}
+				if ($j == 6) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[5] - 1 < 0) {
+							$for_calculate2[6] = 0;
+						} else {
+							$for_calculate2[6] = $for_calculate2[5] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[6] = $for_calculate2[6] + $for_calculate2[5];
+					}
+				}
+				if ($j == 7) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[6] - 1 < 0) {
+							$for_calculate2[7] = 0;
+						} else {
+							$for_calculate2[7] = $for_calculate2[6] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[7] = $for_calculate2[7] + $for_calculate2[6];
+					}
+				}
+				if ($j == 8) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[7] - 1 < 0) {
+							$for_calculate2[8] = 0;
+						} else {
+							$for_calculate2[8] = $for_calculate2[7] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[8] = $for_calculate2[8] + $for_calculate2[7];
+					}
+				}
+				if ($j == 9) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[8] - 1 < 0) {
+							$for_calculate2[9] = 0;
+						} else {
+							$for_calculate2[9] = $for_calculate2[8] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[9] = $for_calculate2[9] + $for_calculate2[8];
+					}
+				}
+				if ($j == 10) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[9] - 1 < 0) {
+							$for_calculate2[10] = 0;
+						} else {
+							$for_calculate2[10] = $for_calculate2[9] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[10] = $for_calculate2[10] + $for_calculate2[9];
+					}
+				}
+				if ($j == 11) {
+					if ($for_calculate2[$j] == 0) {
+
+						if ($for_calculate2[10] - 1 < 0) {
+							$for_calculate2[11] = 0;
+						} else {
+							$for_calculate2[11] = $for_calculate2[10] - 1;
+						}
+
+					} elseif ($for_calculate2[$j] > 0) {
+						$for_calculate2[11] = $for_calculate2[11] + $for_calculate2[10];
+					}
+				}
+
+				$j++;
+
+			}
+		
+		
+		$arraytograph2 = array_combine($montharray, $for_calculate2);
+		$arrayto_graph2 = array();
+		foreach ($arraytograph2 as $key => $value) {
+
+			$arrayto_graph2[] = $arraytograph2[$key];
+
+		}
+		$arraytograph = array_combine($montharray, $for_calculate2);
 		$arrayto_graph = array();
 		foreach ($arraytograph as $key => $value) {
 
@@ -762,38 +752,36 @@ WHERE financial_year =  '2013-2014'	");
 		foreach ($montharray as $key => $value) {
 			$mymontharray[] = $montharray[$key];
 		}
-		//var_dump($mymontharray);
-		//var_dump($arrayto_graph);
-		//exit;
-		$montharray = json_encode($mymontharray);
-		$arrayto_graph = json_encode($arrayto_graph);
-		$arrayactual = json_encode($actualbasket);
-		$data['arrayto_graph'] = $arrayto_graph;
-		$data['arrayactual'] = $arrayactual;
-		$data['montharray'] = $montharray;
-		//$data['content_view'] = "supply_plan_v";
-		//$data['banner_text'] = "charts";
-
+				
+		$data['commodityname'] = $commodity[0];
+		$data['commodityname2'] = $commodity2[0];
+		$data['arrayto_graph'] = json_encode($arrayto_graph);
+		$data['arrayactual'] = json_encode($actualbasket);
+		$data['arrayto_graph2'] = json_encode($arrayto_graph2);
+		$data['arrayactual2'] = json_encode($actualbasket2);
+		$data['montharray'] = json_encode($mymontharray);
 		$this -> load -> view("supply_plan_v", $data);
 	}
 
-public function kemsa_psidata() {
+public function kemsa_data() {
+	if ($this->input->post('year_kemsapsi') && $this->input->post('monthkemsapsi') ){
+		$year_from=$_POST['year_kemsapsi'];		
+	   $month=$_POST['monthkemsapsi'];
+	} else {
+		 $year_from=2013;		
+	     $month=8;
+	}
+		
+		//get available fps at kemsa aggregated
 		//get available fps at kemsa aggregated
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, financial_year
-FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
-THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
-ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
-END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` 
+		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_monthly_c ) AS sohkemsa,  `fpcommodity_Id` 
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
-AND  (
-`transaction_type` =  'SOHKEMSA'
-OR  `transaction_type` =  'INCOUNTRY'
-)
-) AS temp
-WHERE financial_year =  '2013-2014'
-GROUP BY temp.fpcommodity_Id ");
+AND  `transaction_type` =  'SOHKEMSA'
+AND MONTH(  `fp_date` ) =$month
+AND YEAR(  `fp_date` ) =$year_from
+GROUP BY fpcommodity_Id ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp = array();
 		$arraypending = array();
@@ -802,7 +790,10 @@ GROUP BY temp.fpcommodity_Id ");
 			$arrayfp[] = $value['fpcommodity_Id'];
 			$arraypending[] = (double)$value['sohkemsa'];
 		}
-		
+		if (count($arraypending)==0) {
+			$arraypending[]=0;
+			$arrayfp[]=0;
+		} 
 		$arraycombined = array_combine($arrayfp,$arraypending);
 		
 		//var_dump($arraycombined);
@@ -819,7 +810,7 @@ GROUP BY temp.fpcommodity_Id ");
 			$arrayfpname[$values -> id] = $values -> fp_name;
 //$i++;
 		//}
-		
+	
 		}
 		//echo json_encode($arrayfpname);
 		
@@ -855,17 +846,63 @@ GROUP BY temp.fpcommodity_Id ");
 		//exit;
 		//query for second graph psi
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohpsi ) AS sohpsi, financial_year
-FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
-THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
-ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
-END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohpsi,  `fpcommodity_Id` 
+		$st = $con -> execute("SELECT SUM(  `fp_quantity` ) / fpcommodities.projected_monthly_c AS sohpending,  `fpcommodity_Id` 
+FROM pipeline, fpcommodities
+WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
+AND (
+`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED'
+)
+AND MONTH(  `fp_date` ) =$month
+AND YEAR(  `fp_date` ) =$year_from
+GROUP BY fpcommodity_Id  ");
+		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
+		$arrayfp1 = array();
+		$arraypending1 = array();
+		foreach ($result as $value) {
+
+			$arrayfp1[] = $value['fpcommodity_Id'];
+			$arraypending1[] = (double)$value['sohpending'];
+		}
+if (count($arraypending1)==0) {
+			$arraypending1[]=0;
+			$arrayfp1[]=0;
+		} 
+		 $arraycombine = array_combine($arrayfp1, $arraypending1);
+		//var_dump( $arraycombine);
+		//var_dump( $arraypending1);
+//exit;
+		$basketpend = array_replace($arrayfpname, $arraycombine);
+
+		foreach ($basketpend as $key => $val) {
+			if (is_string($val)) {
+				$basketpend[$key] = 0;
+			}
+
+		}
+
+		$array_finalpend = array();
+		foreach ($basketpend as $key => $val) {
+
+			$array_finalpend[] = $basketpend[$key];
+
+		}
+		//var_dump($array_finalpsi);
+		//var_dump($array_finalkemsa);
+		//echo $array_finalkemsa = json_encode($array_finalkemsa);
+		//echo $array_finalfp = json_encode($array_finalfp);
+		//exit;
+		//query for second graph pending
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_monthly_c ) AS sohpsi,  `fpcommodity_Id` 
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
 AND  `transaction_type` =  'SOHPSI'
-) AS temp
-WHERE financial_year =  '2013-2014'
-GROUP BY temp.fpcommodity_Id ");
+AND MONTH(  `fp_date` ) =$month
+AND YEAR(  `fp_date` ) =$year_from
+GROUP BY fpcommodity_Id  ");
+		
+		
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp = array();
 		$arraypending = array();
@@ -875,7 +912,10 @@ GROUP BY temp.fpcommodity_Id ");
 			$arrayfp[] = $value['fpcommodity_Id'];
 			$arraypending[] = (double)$value['sohpsi'];
 		}
-
+if (count($arraypending)==0) {
+			$arraypending[]=0;
+			$arrayfp[]=0;
+		} 
 		$arraycombined = array_combine($arrayfp, $arraypending);
 
 		$basketpsi = array_replace($arrayfpname, $arraycombined);
@@ -893,44 +933,6 @@ GROUP BY temp.fpcommodity_Id ");
 			$array_finalpsi[] = $basketpsi[$key];
 
 		}
-		//var_dump($array_finalpsi);
-		//var_dump($array_finalkemsa);
-		//echo $array_finalkemsa = json_encode($array_finalkemsa);
-		//echo $array_finalfp = json_encode($array_finalfp);
-		//exit;
-		//query for second graph pending
-		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT * FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
-					THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
-					END AS financial_year, SUM(  `fp_quantity` ) / fpcommodities.projected_monthly_c AS sohpending,  `fpcommodity_Id` 
-					FROM pipeline, fpcommodities WHERE fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA' OR  `transaction_type` =  'DELAYED'
-					) GROUP BY fpcommodity_Id ) AS temp	WHERE financial_year =  '2013-2014' ");
-		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
-		$arrayfp = array();
-		$arraypending = array();
-		foreach ($result as $value) {
-
-			$arrayfp[] = $value['fpcommodity_Id'];
-			$arraypending[] = (double)$value['sohpending'];
-		}
-
-		$arraycombined = array_combine($arrayfp, $arraypending);
-
-		$basketpend = array_replace($arrayfpname, $arraycombined);
-
-		foreach ($basketpend as $key => $val) {
-			if (is_string($val)) {
-				$basketpend[$key] = 0;
-			}
-
-		}
-
-		$array_finalpend = array();
-		foreach ($basketpend as $key => $val) {
-
-			$array_finalpend[] = $basketpend[$key];
-
-		}
 		
 		$array_finalkemsa = json_encode($array_finalkemsa);
 		$array_finalfp = json_encode($array_finalfp);
@@ -940,9 +942,8 @@ GROUP BY temp.fpcommodity_Id ");
 		$data['array_finalkemsa'] = $array_finalkemsa;
 		$data['array_finalpend'] = $array_finalpend;
 		$data['arrayfpname'] = $array_finalfp;
-		$this -> load -> view("ajax_view/kemsapsi_ajax_v", $data);
+		$this -> load -> view("ajax_view/kemsa_ajax_v", $data);
 
 	}
-
 
 }

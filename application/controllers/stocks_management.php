@@ -444,17 +444,21 @@ public function supply_plan_default()
 		
 	//create array to carry months
 	$con = Doctrine_Manager::getInstance() -> connection();
-	$st = $con -> execute("SELECT * FROM (
-SELECT CASE WHEN MONTH(  `date` ) >=7
-THEN CONCAT( YEAR( `date` ) ,  '-', YEAR( `date` ) +1 ) 
-ELSE CONCAT( YEAR( `date` ) -1,  '-', YEAR( `date` ) ) 
-END AS financial_year, SUM(  `soh_storeqty` ) / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id`
-FROM fp_stocks, fpcommodities
-WHERE  `fpcommodity_Id` =3
-AND fpcommodities.id = fp_stocks.`fpcommodity_Id` 
-GROUP BY MONTH( fp_stocks.`date` )
+	$st = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year
+FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
+THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
+ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
+END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn
+FROM pipeline, fpcommodities
+WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
+AND (
+`transaction_type` =  'SOHKEMSA'
+OR  `transaction_type` =  'INCOUNTRY'
+)
+AND  `fpcommodity_Id` =10
 ) AS temp
-WHERE financial_year =  '2013-2014' ");
+WHERE financial_year =  '2013-2014'
+GROUP BY monthn ");
 			$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 			
 			$arrayactual = array();
@@ -467,7 +471,20 @@ WHERE financial_year =  '2013-2014' ");
 	7 => 'July',	8 => 'August',	9 => 'September',	10 => 'October',	11 => 'November',	12 => 'December',1 => 'January',	2 => 'Febuary',	3 => 'March',	4 => 'April',	5 => 'May',	6 => 'June'	);
 	//query db for data
 	$con = Doctrine_Manager::getInstance() -> connection();
-	$st = $con -> execute("SELECT *	FROM (	SELECT CASE	WHEN MONTH( eta_details ) >=7 THEN CONCAT( YEAR( eta_details ) ,  '-', YEAR( eta_details ) +1 )	ELSE CONCAT( YEAR( eta_details ) -1,  '-', YEAR( eta_details ) ) END AS financial_year,  `pending`/fpcommodities.projected_monthly_c AS pending ,  `fpcommodity_Id` , MONTHNAME( eta_details ) AS monthname, MONTH( eta_details ) AS monthno, YEAR( eta_details ) AS yearname FROM pipeline_management,fpcommodities WHERE  `fpcommodity_Id` =3 AND  fpcommodities.id = pipeline_management.`fpcommodity_Id`) AS temp	WHERE financial_year =  '2013-2014'	");
+	$st = $con -> execute("SELECT * 
+FROM ( SELECT CASE WHEN MONTH( fp_date ) >=7
+THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
+ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
+END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
+FROM pipeline, fpcommodities
+WHERE  `fpcommodity_Id` =10
+AND fpcommodities.id = pipeline.`fpcommodity_Id` 
+AND  (
+`transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY'
+)
+) AS temp
+WHERE financial_year =  '2013-2014'");
 	//sanitize for use in array
 	$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 	//arrays to hold separate values

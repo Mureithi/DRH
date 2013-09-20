@@ -1,6 +1,14 @@
 <script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
+ <?php
+$current_year = date('Y');
+$earliest_year = $current_year - 4;
+$current_month = date('n');
 
+$montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'April',  5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December');
+
+
+?>
 <style>
 
 .higherWider {
@@ -18,14 +26,12 @@
 	width:70%;	
 		
 	}
-	.pipeline_data h2 {
-		background: #29527b; /* Old browsers */
+	.pipeline_data h2,.containkemsa h2,.containpsi h2 {
+		background: #b4cbe2; /* Old browsers */
 		color: #fff;
-		padding: 8px;
-		margin: 0 0 0.625em 0;
-		-webkit-box-shadow:  0px 2px 6px 0.7px #000;
-        box-shadow:  0px 2px 6px 0.7px #000;
-        -moz-box-shadow:  0px 2px 6px 0.7px #000;
+		padding: 4px;
+		
+		
 	}
 	#graph_content{
 		height:100%;
@@ -42,15 +48,15 @@
 		height:650px;
 			
 	}
-	.mos_kemsa_psi{
+	
+	.containkemsa{
 		
-		width: 100%;
-		margin:auto;
-		height:280px;
+		width: 96%;
+		height:330px;
 		float:left;
 		
 	}
-	
+		
 	.pipeline_data{
 		width: 75%;
 		height:300px;
@@ -65,27 +71,76 @@
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_home">Enter Stocks on Hand</a>
 <!--<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan">Supply Plan</a>-->
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/editSupply_plan">Update Supply Plan</a>
-<button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#SOHModal">Detailed SOH</button>
+<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH</a>
+<!--<button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#SOHModal">Detailed SOH</button>-->
 <button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#supplyplanModal">View Supply Plan</button>
 
         
             </div>
             
             <div class="dashboard">
-            	
-            	<div class="mos_kemsa_psi">
+            	<div class="containkemsa">
+            		<h2>
+		<select name="monthkemsapsi" id="monthkemsapsi">
+			<option>Select Month</option>
+		<?php 
+		for ($i=1; $i < 12 ; ) { 
+			
+		foreach ($montharray as $key => $val) {
+			
+			$year=$montharray[$key];
+			
+			?>
+			<option value="<?php echo $i;?>"><?php echo $year;?></option>
+			
+		<?php $i++;}
+		}
+		?>
+		</select>
+		 
+		<select name="year_kemsapsi" id="year_kemsapsi">
+			<option>Select Year</option>
+			<?php
+		for($x=$current_year;$x>=$earliest_year;$x--){
+			?>
+			<option value="<?php echo $x;?>"
+			<?php
+			if ($x == $current_year) {echo "selected";
+			}
+			?>><?php echo $x;?></option>
+			<?php }?>
+		</select>
+	<button class="btn btn-small btn-success" id="filter_kemsapsi" name="filter_kemsapsi" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
+	<!--<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply  Plan Vs Actual</a>-->
+
+	</h2>
+            	<div class="mos_kemsapsi">
             		
             	</div>
+            	</div>
+            	
+            	
             	
             	<div class="pipeline_data">
             		<h2>
 		
-		<select  id="commoditychange" name="commoditychange" >
+		<select  id="commoditychange1" name="commoditychange1" >
     <option value="0">Select Commodity</option>
 		<?php 
 		foreach ($fpcommodity as $fpcommodity1) {
 			$id=$fpcommodity1->id;
 			$commodity=$fpcommodity1->fp_name;
+			?>
+			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
+		<?php }
+		?>
+	</select> 
+	<select  id="commoditychange2" name="commoditychange2" >
+    <option value="0">Select Commodity</option>
+		<?php 
+		foreach ($fpcommodity as $fpcommodity2) {
+			$id=$fpcommodity2->id;
+			$commodity=$fpcommodity2->fp_name;
 			?>
 			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
 		<?php }
@@ -98,7 +153,8 @@
     <option value="2011-2012">2012-2011</option>
 		
 	</select> 
-	<button class="btn btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
+	
+	<button class="btn btn-small btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
 	<!--<a class="link" data-toggle="modal" data-target="#supplyplanModal" href="#">View Supply Plan</a>-->
 
 	</h2>
@@ -106,55 +162,7 @@
             	</div>
             </div>
             
-              <div id="SOHModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-    <h2 style="font-size: 16px;text-align: center" id="myModalLabel">Total Stocks at Hand</h2>
-     <h3 style="font-size: 15px;text-align: center" id="myModalLabel">KEMSA Stores</h3>
-      </div>
-
-  <table class="table table-hover table-bordered">
-		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
-			<tr>
-				
-				<th colspan="5" style="text-align:center"></th>
-			</tr>
-		</thead>
-		<thead style="font-size: 13px; background: #C8D2E4 ">
-	<tr>
-		<th>FP Commodity</th>
-		<th>Unit</th>
-		<th>Actual SOH</th>
-		<th>SOH in M.O.S</th>
-		<th>Projected Consumption</th>
-		<th>Financial Year</th>
-		
-		
-	</tr>
-	</thead>
-	<tbody>	<?php 
-		foreach ($kemsa_psi as  $value) {
-			$year=$value['financial_year'];
-		
-		?>
-					
-						<tr style="font-size: 12px">
-							<td><?php echo $value['fp_name'];?></td>
-							<td><?php echo $value['Unit'];?></td>
-							<td><?php echo number_format($value['fp_quantity']);?></td>
-							<td><?php echo $value['sohkemsa'];?></td>
-							<td><?php echo number_format($value['projected_monthly_c']);?></td>
-							<td><?php echo $year ;?></td>
-					   </tr>
-					   
-					<?php }?>	
-		</tbody>
-		
-			
-	 
-</table>
-  
-  </div>
+              
   <div id="supplyplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
@@ -230,35 +238,92 @@
 	$(document).ready(function() {
 	$(function() {
 		
-		$("#commoditychange").val(10)
+		$("#commoditychange").val(1)
+		
 		var div="#graph_content";
 		var url = "<?php echo base_url()."Fp_management/supply_plan_default"?>";
-		ajax_request (url,div);
+		request (url,div);
 		
-		var div=".mos_kemsa_psi";
-		var url = "<?php echo base_url()."Fp_management/kemsa_psidata"?>";
-		ajax_request (url,div);
+				
+		var div=".mos_kemsapsi";
+		var url = "<?php echo base_url()."Fp_management/kemsa_data"?>";
+		request (url,div);
 		 
-     
+     function request (url,div){
+	var url =url;
+	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
+	 $.ajax({
+          type: "POST",
+          url: url,
+          beforeSend: function() {
+            $(div).html("");
+            
+             $(div).html("<img style='margin-left:45%;margin-top:10%;' src="+loading_icon+">");
+            
+          },
+          success: function(msg) {
+          $(div).html("");
+            $(div).html(msg);           
+          }
+        });
+         
+}
          	
     $('#filter').click(function() {
+    	var fyear=$("#financeyear").val();
+    	var fcommodity=$("#commoditychange1").val();
+    	var fcommodity2=$("#commoditychange2").val();
+    	
+    	if (fyear==0) {
+						
+						alert("Please select Financial Year");
+						return;
+					}
+					if (fcommodity==0) {
+						
+						alert("Please select FP Commodity.");
+						return;
+					}
          var div="#graph_content";
-		var url = "<?php echo base_url()."Fp_management/supply_plan_filtered"?>";		
-		//url=url+"/"+$("#commoditychange").val();
-		//alert($("#financeyear").val());
+		var url = "<?php echo base_url()."Fp_management/supply_plan_default"?>";		
+		//var why = $("#commoditychange").val();
+		//var why = $("#financeyear").val();
+				ajax_request (url,div);
+		
+				
+		});
+			
+		 $('#filter_kemsapsi').click(function() {
+    	var kmonth=$("#monthkemsapsi").val();
+    	var kyear=$("#year_kemsapsi").val();
+    	
+    	if (kyear==0) {
+						
+						alert("Please select Year");
+						return;
+					}
+					if (kmonth==0) {
+						
+						alert("Please select Month.");
+						return;
+					}
+         var div=".mos_kemsapsi";
+		var url = "<?php echo base_url()."Fp_management/kemsa_data"?>";		
 		
 				ajax_request (url,div);
 		
 				
 		});
 		
+		
+				
 		function ajax_request (url,div){
 	var url =url;
 	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
 	 $.ajax({
           type: "POST",
+           data: {year_kemsapsi: $("#year_kemsapsi").val(),monthkemsapsi: $("#monthkemsapsi").val(),financeyear: $("#financeyear").val(),commoditychange1: $("#commoditychange1").val(),commoditychange2: $("#commoditychange2").val()},
           url: url,
-          data: { commoditychange: $("#commoditychange").val(),financeyear: $("#financeyear").val() },
           beforeSend: function() {
             $(div).html("");
             

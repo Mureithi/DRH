@@ -49,7 +49,8 @@ THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 )
 ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
 END AS financial_year
 FROM pipeline, fpcommodities, funding_sources
-WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
+WHERE fpcommodities.id = pipeline.`fpcommodity_Id`
+AND (`transaction_type`='PENDINGKEMSA' OR `transaction_type`='DELAYED')
 AND funding_sources.id = pipeline.`funding_source`
 ) AS temp
 WHERE financial_year =  '2013-2014'  ");
@@ -94,6 +95,21 @@ GROUP BY temp.fpcommodity_Id");
 
         return $supplyplan ;
         } 
+        
+        public static function soh_kemsa_psi($year_from,$month){
+     
+		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
+		->fetchAll("SELECT  `fp_quantity` ,  SUM(`fp_quantity` / fpcommodities.projected_monthly_c) AS sohkemsa, fp_date, `fpcommodity_Id` , fpcommodities.fp_name, Unit, projected_monthly_c,  `transaction_type` 
+FROM pipeline, fpcommodities
+WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
+AND YEAR(  `fp_date` ) = $year_from
+AND MONTH(  `fp_date` ) = $month
+GROUP BY  `fpcommodity_Id");
+
+        return $supplyplan ;
+        } 
+        
+        
 	
 	
 }

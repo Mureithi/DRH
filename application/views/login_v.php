@@ -23,7 +23,7 @@ to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
 </style>	
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>HCMP | Login</title>
+<title>HCMP-DRH | Login</title>
 
  <script src="<?php echo base_url().'Scripts/jquery.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/jquery-ui.js'?>" type="text/javascript"></script>
@@ -87,7 +87,8 @@ $('.errorlogin').fadeOut(5000, function() {
 
 				<div id="Banner">
 					<span style="display: block; font-weight: bold; font-size: 14px; margin:2px;">Ministry of Health</span>
-					<span style="display: block; font-size: 12px;">Health Commodities Management Platform</span>	
+					<span style="display: block; font-size: 12px;">Health Commodities Management Platform</span>
+					<span style="display: block; font-size: 12px;">Division Of Reproductive Health(DRH)</span>	
 				</div>
 				<div class="banner_text" style="float: left"><?php //echo $banner_text;?></div>
 				

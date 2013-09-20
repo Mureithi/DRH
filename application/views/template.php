@@ -74,9 +74,8 @@ if ($access_level == "dpp") {
 <script src="<?php echo base_url().'Scripts/jquery.validate.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints-sticky.min.js'?>" type="text/javascript"></script>
-
-
-
+<script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
+<script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
 
 
   <?php
@@ -185,6 +184,8 @@ return i;
 				<div id="system_title">
 					<span style="display: block; font-weight: bold; font-size: 14px; margin:2px;">Ministry of Health</span>
 					<span style="display: block; font-size: 12px;">Health Commodities Management Platform</span>
+					<span style="display: block; font-size: 12px;">Division Of Reproductive Health(DRH)</span>	
+
 					
 				</div>
 			<?php if($banner_text=="New Order"):?>
@@ -217,8 +218,9 @@ if($user_is_facility){
 ?>
 <li class=""><a  href="<?php echo base_url(); ?>home_controller">Home</a></li>
  	 
-<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Pipeline</a></li>
-<li><a  href="<?php echo base_url(); ?>" class="">Settings</a></li>
+<!--<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Stock Management</a></li>-->
+<li><a  href="<?php echo base_url(); ?>fp_management/" class="">Pipeline</a></li>
+<li><a  href="<?php echo base_url(); ?>fp_management/settings_home" class="">Settings</a></li>
 <?php }  ?>
 
 
@@ -227,8 +229,7 @@ if($user_is_facility){
 </nav>
 </div>
   	
-	<div style="font-size:15px; float:right; padding: 1em "><?php date_default_timezone_set('Europe/Moscow'); echo date('l, dS F Y'); ?>&nbsp;<div id="clock" style="font-size:15px; float:right; " ></div>
-	 </div><div style="width :53em;height: 4.2em; margin: auto; ;" ></div>
+	<div style="width :53em;height: 2em; margin: auto; ;" ></div>
 	 <div >
 <?php $flash_success_data = NULL;
 	$flash_error_data = NULL;
@@ -246,10 +247,10 @@ if($user_is_facility){
 		<div style="float:right">
 		
 		
-<div class="btn-group">
-  <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user icon-white"></i> <?php echo $this -> session -> userdata('names'); ?> <?php echo $this -> session -> userdata('inames'); ?><span style="margin-left: 0.3em;" class="caret"></span></a>
+<div class="btn-group" >
+  <a style="margin-right: 0.5em" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user icon-white"></i> <?php echo $this -> session -> userdata('names'); ?> <?php echo $this -> session -> userdata('inames'); ?><span style="margin-left: 0.3em;" class="caret"></span></a>
   
-  <ul class="dropdown-menu" style="font:#FFF">
+  <ul class="dropdown-menu" style="font:#FFF;">
     <li><a href="#"><i class="icon-pencil"></i> Edit Settings</a></li>
     <li><a href="#myModal" data-toggle="modal" data-target="#myModal" id="changepswd" ><i class="icon-edit"></i> Change password</a></li>
     
@@ -258,8 +259,7 @@ if($user_is_facility){
     <li><a href="<?php echo base_url(); ?>user_management/logout"><i class=" icon-off"></i> Log Out</a></li>
   </ul>
 </div>
-		<a class="link" href="<?php echo base_url(); ?>user_management/logout"><i class="icon-off"></i> Log Out</a> 
-	
+			
 		</div>
 	
 	</div>
