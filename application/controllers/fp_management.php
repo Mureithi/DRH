@@ -57,10 +57,10 @@ class Fp_management extends MY_Controller {
 		}
 		
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` = $qtyReceive,
-		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` =$trid; ");
+		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` = '$qtyReceive',
+		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` ='$trid'; ");
 		
-			
+			//exit;
 		$this->session->set_flashdata('system_success_message', "Transaction Updated");
 		redirect('fp_management/editSupply_plan');
 
@@ -231,20 +231,7 @@ public function soh_filtered() {
 		
 		
 	}
-	public function settings_home() {
-
-		
-		$data['title'] = "Settings";
-		$data['content_view'] = "settings_home_v";
-		$data['banner_text'] = "Settings";
-		$data['kemsa_psi'] = Pipeline::kemsa_psi();
-		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-		$data['supplyplan'] = Pipeline::get_supply_plan();
-		$data['fundingsource'] = Funding_source::getAllfpfundingsources();
-		$this -> load -> view("template", $data);
-	}
 	
-
 	
 	public function supply_plan_default() {
 				//create array to carry months
@@ -256,7 +243,7 @@ if ($this->input->post('financeyear') && $this->input->post('commoditychange1') 
 	   $fpcommodity2=$_POST['commoditychange2'];
 	} else {
 	 $f_year=2013-2014;		
-	 $fpcommodity1=8;
+	 $fpcommodity1=2;
 	 $fpcommodity2=1;
 		//exit;
 	}
@@ -266,7 +253,7 @@ FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
 THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
 ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
-FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND ( `transaction_type` =  'SOHKEMSA' OR  `transaction_type` =  'INCOUNTRY')
+FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND  `transaction_type` =  'SOHKEMSA' 
 AND `fpcommodity_Id` ='$fpcommodity1' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		
@@ -275,7 +262,7 @@ FROM ( SELECT CASE WHEN MONTH(  `fp_date` ) >=7
 THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 ) 
 ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
-FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND ( `transaction_type` =  'SOHKEMSA' OR  `transaction_type` =  'INCOUNTRY')
+FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND  `transaction_type` =  'SOHKEMSA' 
 AND `fpcommodity_Id` ='$fpcommodity2' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
 		$result2 = $st2 -> fetchAll(PDO::FETCH_ASSOC);
 				
@@ -396,15 +383,16 @@ OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS 
 		foreach ($arrayfinal as $key => $value) {
 			$for_calculate[] = $arrayfinal[$key];
 		}
-		//var_dump($for_calculate);
-		//exit;
 		
-
+		
+$i = 0;
 			foreach ($for_calculate as $key => $value) {
 				//check for the 1st index
-$i = 0;
+
 				if ($i == 0) {
 					if ($for_calculate[$i] == 0) {
+						//var_dump($for_calculate);
+		//exit;
 						$for_calculate[$key] = $actualbasket[0];
 
 					}
@@ -553,10 +541,11 @@ $i = 0;
 						$for_calculate[11] = $for_calculate[11] + $for_calculate[10];
 					}
 				}
-
+		
 				$i++;
 
 			}
+
 
 foreach ($basket2 as $key => $val) {
 			if (is_string($val)) {
@@ -574,10 +563,10 @@ foreach ($basket2 as $key => $val) {
 		//var_dump($for_calculate);
 		//exit;
 		
-
+$j = 0;
 			foreach ($for_calculate2 as $key => $value) {
 				//check for the 1st index
-$j = 0;
+
 				if ($j == 0) {
 					if ($for_calculate2[$j] == 0) {
 						$for_calculate2[$key] = $actualbasket2[0];
@@ -741,7 +730,7 @@ $j = 0;
 			$arrayto_graph2[] = $arraytograph2[$key];
 
 		}
-		$arraytograph = array_combine($montharray, $for_calculate2);
+		$arraytograph = array_combine($montharray, $for_calculate);
 		$arrayto_graph = array();
 		foreach ($arraytograph as $key => $value) {
 
@@ -752,6 +741,10 @@ $j = 0;
 		foreach ($montharray as $key => $value) {
 			$mymontharray[] = $montharray[$key];
 		}
+			//var_dump($arrayto_graph);
+			
+			//var_dump($arrayto_graph2);
+			//exit;
 				
 		$data['commodityname'] = $commodity[0];
 		$data['commodityname2'] = $commodity2[0];
@@ -772,7 +765,6 @@ public function kemsa_data() {
 	     $month=8;
 	}
 		
-		//get available fps at kemsa aggregated
 		//get available fps at kemsa aggregated
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_monthly_c ) AS sohkemsa,  `fpcommodity_Id` 
@@ -894,7 +886,7 @@ if (count($arraypending1)==0) {
 		//exit;
 		//query for second graph pending
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_monthly_c ) AS sohpsi,  `fpcommodity_Id` 
+		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_psi ) AS sohpsi,  `fpcommodity_Id` 
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
 AND  `transaction_type` =  'SOHPSI'

@@ -76,7 +76,7 @@
 		<thead style="font-size: 13px; background: #C8D2E4 ">
 	<tr>
 		<th>FP Commodity</th>
-		<th>Unit</th>
+		<!--<th>Unit</th>-->
 		<th>Store</th>
 		<th>Date as of</th>
 		<th>Quantity</th>
@@ -99,7 +99,7 @@
 							<?php }
 							?>
 								</select> </td>
-							<td></td>
+							
 							<td><select id="store[]" name="store[]">
        								<option value="0">Select Store</option>
        								<option value="SOHKEMSA">KEMSA</option>
@@ -108,8 +108,8 @@
 							<td><input type="text" id="dateofstock" name="dateofstock[]" class="my_date" placeholder="Date"></td>
 							<td><input type="text" id="actualqty[]" name="actualqty[]" placeholder="Quantity"></td>
 							
-							<td><a class="btn " href="#" id="btnAdd">+</a></td>
-							<td><a class="btn btn-primary btnDel " href="#">-</a></td>
+							<td><a class="btn btn-mini " href="#" id="btnAdd">+</a></td>
+							<td><a class="btn btn-mini btn-primary btnDel " href="#">-</a></td>
 
 							
 							

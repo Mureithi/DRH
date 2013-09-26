@@ -117,10 +117,14 @@ echo form_close();
 				if (radio_value == '1') {
 					$("#actionreceive").show("slow");
 					$("#actiondelay").hide("fast");
+					$('#delay').val('');
+					$('#comment').val('');
 
 				} else if (radio_value == '2') {
 					$("#actiondelay").show("slow");
 					$("#actionreceive").hide("fast");
+					$('#Receive').val('');
+					$('#qtyReceive').val('');
 				}
     
   });	

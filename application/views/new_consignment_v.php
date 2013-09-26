@@ -101,7 +101,7 @@
 	</select> </td>
 							<td></td>
 							<td><select  id="funding_source[]" name="funding_source[]" >
-    <option>Select Commodity</option>
+    <option>Select Funding Source</option>
 		<?php 
 		foreach ($fundingsource as $fundingsource) {
 			$id=$fundingsource->id;

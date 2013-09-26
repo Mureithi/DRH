@@ -43,17 +43,19 @@ $(document).ready(function() {
                 borderWidth: 0
             },
             series: [ {
-                name: 'Supply Plan (<?php echo $commodityname2 ?>)',
+                name: 'Supply Plan (<?php echo $commodityname ?>)',
                 data: <?php echo $arrayto_graph ?>
             }, {
-                name: 'Actual MOS (<?php echo $commodityname2 ?>)',
+                name: 'Actual MOS (<?php echo $commodityname ?>)',
+                type: 'column',
                 data: <?php echo $arrayactual ?>
             },
             {
-                name: 'Supply Plan (<?php echo $commodityname ?>)',
+                name: 'Supply Plan (<?php echo $commodityname2 ?>)',
                 data: <?php echo $arrayto_graph2 ?>
             }, {
-                name: 'Actual MOS (<?php echo $commodityname ?>)',
+                name: 'Actual MOS (<?php echo $commodityname2 ?>)',
+                type: 'column',
                 data: <?php echo $arrayactual2 ?>
             }]
        		 });

@@ -220,7 +220,7 @@ if($user_is_facility){
  	 
 <!--<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Stock Management</a></li>-->
 <li><a  href="<?php echo base_url(); ?>fp_management/" class="">Pipeline</a></li>
-<li><a  href="<?php echo base_url(); ?>fp_management/settings_home" class="">Settings</a></li>
+<li><a  href="<?php echo base_url(); ?>settings" class="">Settings</a></li>
 <?php }  ?>
 
 

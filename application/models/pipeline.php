@@ -32,12 +32,29 @@ class Pipeline extends Doctrine_Record {
 	public static function getAll_edit($trid)
 	{
 		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
-		->fetchAll("SELECT pipeline.id AS tr_id, fp_name, fp_quantity, Unit, funding_sources.funding_source,fp_date, projected_monthly_c
+		->fetchAll("SELECT pipeline.id AS tr_id, fp_name, funding_sources.id as funding_id,fp_quantity, Unit, funding_sources.funding_source,fp_date, projected_monthly_c
 FROM  `pipeline` , fpcommodities, funding_sources WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND funding_sources.id = pipeline.`funding_source` AND pipeline.id =$trid");
 
         return $supplyplan ;
 	} 
 	
+	public static function getall_supply_plan(){
+     
+		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
+		->fetchAll("SELECT fpcommodities.fp_name, pipeline.id AS tr_id, fpcommodities.Unit, funding_sources.`funding_source` , funding_sources.id as funding_id, `fp_date` ,  `fp_quantity` ,  `transaction_type` ,  `date_receive` ,  `delay_to` 
+FROM pipeline, fpcommodities, funding_sources
+WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
+AND (
+ `transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED'
+)
+AND funding_sources.id = pipeline.`funding_source` 
+ORDER BY  `pipeline`.`fp_date` DESC 
+
+  ");
+
+        return $supplyplan ;
+	} 
 	
 	public static function get_supply_plan(){
      
@@ -57,6 +74,7 @@ WHERE financial_year =  '2013-2014'  ");
 
         return $supplyplan ;
 	} 
+	
 	
 	public static function supply_plan_filter($f_year,$fpids){
      
@@ -110,6 +128,13 @@ GROUP BY  `fpcommodity_Id");
         } 
         
         
-	
+	public static function getall_soh(){
+     
+		$supplyplan = Doctrine_Manager::getInstance()->getCurrentConnection()
+		->fetchAll("SELECT pipeline.id, fpcommodities.fp_name, fpcommodities.Unit,pipeline.fp_quantity,pipeline.fp_date ,transaction_type 
+FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND (`transaction_type` =  'SOHKEMSA' OR  `transaction_type` =  'SOHPSI')");
+
+        return $supplyplan ;
+        } 
 	
 }
