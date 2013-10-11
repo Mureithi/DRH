@@ -70,6 +70,11 @@ public function delete_transaction($trid) {
 		$Dateexp=$_POST['Dateexp'];
 		$date=date('y-m-d',strtotime($Dateexp));
 		
+		//echo $Dateexp;
+		//echo strtotime('16 Apr 2014');
+		//echo '<br/>';
+		//echo strtotime($Dateexp);
+		//exit;
 		
 				
 		$con = Doctrine_Manager::getInstance() -> connection();
@@ -128,6 +133,95 @@ public function soh_s()
 		$this -> load -> view("ajax_view/soh_settings_v", $data);
 			
 }
+public function pipeline_s()
+{
+		$data['pipeline'] = Pipeline::getall_pipeline();
+		$this -> load -> view("ajax_view/pipeline_settings_v", $data);
+			
+}
+public function edit_pipeline($fpid) {
+		
+		$data['content_view'] = "ajax_view/pipelinesettings_v";
+		$data['title'] = "Edit";
+		$data['banner_text'] = "Edit Pipeline";
+		$data['soh'] = Pipeline::getid_pipeline($fpid);
+		$this -> load -> view("template", $data);
 
+	}
+
+public function delete_pipeline($fpid) {
+		
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute(" DELETE FROM  `drh`.`pipeline` WHERE  `pipeline`.`id` =$fpid; ");
+		$this->session->set_flashdata('system_error_message', "Record Deleted");
+		redirect('settings');
+		
+
+	}
+public function edit_soh($fpid) {
+		
+		$data['content_view'] = "ajax_view/sohsettings_v";
+		$data['title'] = "Edit";
+		$data['banner_text'] = "Edit SOH";
+		$data['soh'] = Pipeline::getid_soh($fpid);
+		$this -> load -> view("template", $data);
+		
+
+	}
+
+public function delete_soh($fpid) {
+		
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute(" DELETE FROM  `drh`.`pipeline` WHERE  `pipeline`.`id` =$fpid; ");
+		$this->session->set_flashdata('system_error_message', "Record Deleted");
+		redirect('settings');
+		
+
+	}
+public function update_soh() {
+		$quantity=$_POST['Quantity'];
+		 $fp_name=$_POST['fp_name'];	
+	    $trid=$_POST['trid'];	
+		$Date_of=$_POST['Date_of'];
+		$Store=$_POST['Store'];
+		$ddate=date('y-m-d',strtotime($Date_of));
+		
+			if ($Store=='KEMSA') {
+			$transaction='SOHKEMSA';
+			
+		}else {
+			 $transaction='SOHPSI';
+			
+		}
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `transaction_type` = '$transaction', `fp_quantity`='$quantity' ,`fp_date` = '$ddate' WHERE  `pipeline`.`id` ='$trid'; ");
+		
+		$this->session->set_flashdata('system_success_message', "You edited $fp_name ");
+		redirect('settings');
+
+	}
+	
+	public function update_pipeline() {
+		$quantity=$_POST['Quantity'];
+		 $fp_name=$_POST['fp_name'];	
+	    $trid=$_POST['trid'];	
+		$Date_of=$_POST['Date_of'];
+		$Store=$_POST['Store'];
+		$ddate=date('y-m-d',strtotime($Date_of));
+		
+			if ($Store=='KEMSA') {
+			$transaction='SOHKEMSA';
+			
+		}else {
+			 $transaction='SOHPSI';
+			
+		}
+		$con = Doctrine_Manager::getInstance() -> connection();
+		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `transaction_type` = '$transaction', `fp_quantity`='$quantity' ,`fp_date` = '$ddate' WHERE  `pipeline`.`id` ='$trid'; ");
+		
+		$this->session->set_flashdata('system_success_message', "You edited $fp_name ");
+		redirect('settings');
+
+	}
 	}
 	

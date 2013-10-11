@@ -67,6 +67,8 @@ if ($access_level == "dpp") {
 <link href="<?php echo base_url().'CSS/bootstrap-responsive.css'?>" type="text/css" rel="stylesheet"/>
 <link href="<?php echo base_url().'CSS/jquery-ui.css'?>" type="text/css" rel="stylesheet"/> 
 <script src="<?php echo base_url().'Scripts/jquery.js'?>" type="text/javascript"></script>
+<script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
+<script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/bootstrap.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/jquery.form.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/jquery-ui.js'?>" type="text/javascript"></script>
@@ -74,8 +76,8 @@ if ($access_level == "dpp") {
 <script src="<?php echo base_url().'Scripts/jquery.validate.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints.js'?>" type="text/javascript"></script> 
 <script src="<?php echo base_url().'Scripts/waypoints-sticky.min.js'?>" type="text/javascript"></script>
-<script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
-<script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
+
 
 
   <?php

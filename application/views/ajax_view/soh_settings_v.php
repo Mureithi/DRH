@@ -13,8 +13,7 @@
 		<th>Unit</th>
 		<th>Available Quntity</th>
 		<th >Stock Date as of</th>
-		<th ></th>
-		
+		<th >Store</th>		
 		<th >Action  </th>
 		
 		
@@ -31,7 +30,12 @@
 							<td><?php echo $val['Unit'];?></td>
 							<td><?php echo $val ['fp_quantity'];?></td>
 							<td><?php echo  $val ['fp_date'];?></td>
-							<td></td>
+							<td><?php if ($val['transaction_type']=='SOHKEMSA') {
+								echo 'KEMSA';
+							} elseif($val['transaction_type']=='SOHPSI') {
+								echo 'PSI';
+							}
+							 ?></td>
 							
 								<td><button class="btn btn-mini btn-success Editable" id="<?php echo $val['id'];?>" value="" >Edit <i class="icon-edit"></i></button>|
 								<button class="btn btn-mini btn-danger delete" id="<?php echo $val['id'];?>" value="" >Delete <i class="icon-remove-sign"></i></button>
@@ -85,15 +89,15 @@
 
  	 $('.Editable').click(function() {
           alert("You are about to edit this field,Proceed?");
-         	var fpid=$(this).attr('id');
-			window.location="<?php echo base_url();?>settings/edit_fptransaction/"+encodeURIComponent(fpid);
+         	var trid=$(this).attr('id');
+			window.location="<?php echo base_url();?>settings/edit_soh/"+encodeURIComponent(trid);
 		
 		});
 		
 		$('.delete').click(function() {
           alert("You are about to edit this field,Proceed?");
-         	var fpid=$(this).attr('id');
-			window.location="<?php echo base_url();?>settings/delete_fptransaction/"+encodeURIComponent(fpid);
+         	var trid=$(this).attr('id');
+			window.location="<?php echo base_url();?>settings/delete_soh/"+encodeURIComponent(trid);
 		
 		});
 		

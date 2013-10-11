@@ -43,8 +43,11 @@ class Fp_management extends MY_Controller {
 		$trid=$_POST['trid'];		
 	    $Receive=$_POST['Receive'];
 		$qtyReceive=$_POST['qtyReceive'];
+		$receive_wait=$_POST['receive_wait'];
+		$qty_incountry=$_POST['qty_incountry'];
 		$delay=$_POST['delay'];
 		$comment=$_POST['comment'];
+		$date_incountry=date('y-m-d',strtotime($receive_wait));
 		$receivedate=date('y-m-d',strtotime($Receive));
 		$delaydate=date('y-m-d',strtotime($delay));
 		
@@ -52,13 +55,16 @@ class Fp_management extends MY_Controller {
 			$updateaction='INCOUNTRY';
 			
 		}elseif ($action==2) {
+			 $updateaction='RECEIVED';
+			
+		}elseif ($action==3) {
 			 $updateaction='DELAYED';
 			
 		}
 		
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` = '$qtyReceive',
-		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment' WHERE  `pipeline`.`id` ='$trid'; ");
+		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment',`date_incountry` = '$date_incountry', `qty_incountry` = '$qty_incountry' WHERE  `pipeline`.`id` ='$trid'; ");
 		
 			//exit;
 		$this->session->set_flashdata('system_success_message', "Transaction Updated");
@@ -69,7 +75,7 @@ class Fp_management extends MY_Controller {
 	public function Supply_plan() {
 
 		$data['content_view'] = "new_consignment_v";
-		$data['title'] = "Edit Supply Plan";
+		$data['title'] = "New Supply Plan";
 		$data['banner_text'] = "Edit Supply Plan";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline_management::get_supplyplan();
@@ -81,7 +87,7 @@ class Fp_management extends MY_Controller {
 
 		$data['content_view'] = "soh_v";
 		$data['title'] = "New SOH";
-		$data['banner_text'] = "Edit Supply Plan";
+		$data['banner_text'] = "New SOH";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline_management::get_supplyplan();
 		$data['fundingsource'] = Funding_source::getAllfpfundingsources();
@@ -90,7 +96,7 @@ class Fp_management extends MY_Controller {
 	}
 
 
-	public function editSupply_plan() {
+	public function editsupply_plan() {
 
 		$data['content_view'] = "edit_supplyplan_v";
 		$data['title'] = "Edit Supply Plan";
@@ -102,10 +108,11 @@ class Fp_management extends MY_Controller {
 	}
 	public function supply_plan_filter() {
 		
-		$fpids=$_POST['commoditychange'];		
-	    $f_year=$_POST['financeyear'];
-		//$fpids=1;		
-	   // $f_year='2013-2014';
+		 $fpids=$_POST['commoditychange'];		
+	     $f_year=$_POST['financeyear'];
+		// $data=Pipeline::supply_plan_filter($f_year,$fpids);
+		 //var_dump($data);
+		// exit;
 		$data['banner_text'] = "Edit Supply Plan";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline::supply_plan_filter($f_year,$fpids);
@@ -114,20 +121,17 @@ class Fp_management extends MY_Controller {
 	}
 public function soh_detailed() {
 	   
-		$year_from=date('Y');;		
+		$year_from=date('Y');		
 	    $month=date('n');
 		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month);
-		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month));
-		if ($mycount==0) {
-			echo "<div>No Record</>";
-		} elseif($mycount>0) {
+		$data['mycount'] = count(Pipeline::soh_kemsa_psi($year_from,$month));
 		$data['content_view'] = "soh_detailed";
 		$data['title'] = "SOH";
 		$data['banner_text'] = "SOH Detailed";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-		$data['supplyplan'] = Pipeline::get_supply_plan();
+		$data['supplyplan'] = Pipeline::soh_kemsa_psi($year_from,$month);;
 		$this -> load -> view("template", $data);	
-		}
+		//}
 		
 		
 
@@ -141,7 +145,7 @@ public function soh_filtered() {
 		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month));
 		
 		if ($mycount==0) {
-			echo "<div style='margin-left:50%;margin-top:5%;font-size:18px'>No Record for $month $year_from</>";
+			echo "<div style='margin-left:50%;margin-top:5%;font-size:22px'>No Record for $month $year_from</>";
 		} elseif($mycount>0) {
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline::get_supply_plan();
@@ -167,6 +171,7 @@ public function soh_filtered() {
 		$fpids=$_POST['pipecommodity'];		
 	    $f_source=$_POST['funding_source'];
         $qty=$_POST['quantity'];
+		$procureA=$_POST['procureA'];
 		$thedate=$_POST['etadetails'];
 		$transaction_type='PENDINGKEMSA';
 		 $j=sizeof ($fpids);
@@ -179,7 +184,7 @@ public function soh_filtered() {
 				$count++;
 				
 				$mydata = array('fpcommodity_Id' => $fpids[$me], 'funding_source'=>$f_source[$me],'fp_quantity'=> $qty[$me] ,
-				 'fp_date'=>date('y-m-d',strtotime($thedate[$me])),'transaction_type'=>$transaction_type);
+				 'fp_date'=>date('y-m-d',strtotime($thedate[$me])),'procuring_agency'=>$procureA[$me],'transaction_type'=>$transaction_type);
 				
 				$u = new Pipeline();
 
@@ -241,10 +246,12 @@ if ($this->input->post('financeyear') && $this->input->post('commoditychange1') 
 		$f_year=$_POST['financeyear'];		
 	   $fpcommodity1=$_POST['commoditychange1'];
 	   $fpcommodity2=$_POST['commoditychange2'];
+	   $graphtype=$_POST['graphtype'];
 	} else {
-	 $f_year=2013-2014;		
+	 $f_year='2013-2014';		
 	 $fpcommodity1=2;
 	 $fpcommodity2=1;
+	 $graphtype='line';
 		//exit;
 	}
 		$con = Doctrine_Manager::getInstance() -> connection();
@@ -254,7 +261,7 @@ THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 )
 ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
 FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND  `transaction_type` =  'SOHKEMSA' 
-AND `fpcommodity_Id` ='$fpcommodity1' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
+AND `fpcommodity_Id` ='$fpcommodity1' ) AS temp WHERE financial_year =  '$f_year' GROUP BY monthn, fpcommodity_Id ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		
 $st2 = $con -> execute("SELECT fpcommodity_Id, SUM( sohkemsa ) AS sohkemsa, monthn, financial_year, fp_name
@@ -263,7 +270,7 @@ THEN CONCAT( YEAR(  `fp_date` ) ,  '-', YEAR(  `fp_date` ) +1 )
 ELSE CONCAT( YEAR(  `fp_date` ) -1,  '-', YEAR(  `fp_date` ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS sohkemsa,  `fpcommodity_Id` , MONTH(  `fp_date` ) AS monthn, fp_name
 FROM pipeline, fpcommodities WHERE pipeline.`fpcommodity_Id` = fpcommodities.id AND  `transaction_type` =  'SOHKEMSA' 
-AND `fpcommodity_Id` ='$fpcommodity2' ) AS temp WHERE financial_year =  '2013-2014' GROUP BY monthn, fpcommodity_Id ");
+AND `fpcommodity_Id` ='$fpcommodity2' ) AS temp WHERE financial_year =  '$f_year' GROUP BY monthn, fpcommodity_Id ");
 		$result2 = $st2 -> fetchAll(PDO::FETCH_ASSOC);
 				
 		$monthnos =  array();
@@ -327,14 +334,14 @@ THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 )
 ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
 END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
 FROM pipeline, fpcommodities WHERE  `fpcommodity_Id` ='$fpcommodity1' AND fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '2013-2014'");
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '$f_year'");
 		//sanitize for use in array
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		//arrays to hold separate values
 		 $st2 = $con -> execute("SELECT * FROM ( SELECT CASE WHEN MONTH( fp_date ) >=7 THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
 ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) END AS financial_year,  `fp_quantity` / fpcommodities.projected_monthly_c AS pending,  `fpcommodity_Id` , MONTHNAME( fp_date ) AS monthname, MONTH( fp_date ) AS monthno, YEAR( fp_date ) AS yearname
 FROM pipeline, fpcommodities WHERE  `fpcommodity_Id` ='$fpcommodity2' AND fpcommodities.id = pipeline.`fpcommodity_Id` AND  (`transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '2013-2014'");
+OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS temp WHERE financial_year =  '$f_year'");
 		//sanitize for use in array
 		
 		$result2 = $st2 -> fetchAll(PDO::FETCH_ASSOC);
@@ -345,10 +352,11 @@ OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS 
 			$monthno[] = $value['monthno'];
 			$pend[] = (double)$value['pending'];
 		}
-		if (count($pend)==0) {
-			$pend[]=0;
-			$monthno[]=7;
-		} 
+		
+		//if (count($pend)==0) {
+			//$pend[]=0;
+			//$monthno[]=7;
+		//} 
 		
 		$monthno2 = array();
 		$pend2 = array();
@@ -357,10 +365,19 @@ OR  `transaction_type` =  'DELAYED' OR  `transaction_type` =  'INCOUNTRY' )) AS 
 			$monthno2[] = $value['monthno'];
 			$pend2[] = (double)$value['pending'];
 		}
-		if (count($pend2)==0) {
+		if (count($pend)==0 && count($pend2)==0) {
+			//$pend2[]=0;
+			//$monthno2[]=7;
+			echo "<div style='margin-left:50%;margin-top:5%;font-size:22px'>No Record found For Selected Commodities </>";
+			exit;
+		}elseif (count($pend)==0 || count($pend2)==0) {
+			$pend[]=0;
+			$monthno[]=7;
 			$pend2[]=0;
 			$monthno2[]=7;
 		} 
+		
+		
 		
 		//combine data for corespondence, ie map months with respective values
 		$arraycombined = array_combine($monthno, $pend);
@@ -746,6 +763,7 @@ $j = 0;
 			//var_dump($arrayto_graph2);
 			//exit;
 				
+		$data['graphtype'] = json_encode($graphtype);
 		$data['commodityname'] = $commodity[0];
 		$data['commodityname2'] = $commodity2[0];
 		$data['arrayto_graph'] = json_encode($arrayto_graph);
@@ -757,14 +775,26 @@ $j = 0;
 	}
 
 public function kemsa_data() {
-	if ($this->input->post('year_kemsapsi') && $this->input->post('monthkemsapsi') ){
-		$year_from=$_POST['year_kemsapsi'];		
-	   $month=$_POST['monthkemsapsi'];
+	if ($this->input->post('as_of')){
+		$as_of=$_POST['as_of'];		
+	  	$date_asof=date('Y-m-d',strtotime($as_of));
 	} else {
-		 $year_from=2013;		
-	     $month=8;
+		 $date_asof=date('Y-m-d');
+		 $year=date('Y');		
+	   	 $month=date('n');
 	}
-		
+		$split_date=explode('-', $date_asof);
+		$year=$split_date[0];
+		$month=$split_date[1];
+		$day=$split_date[2];
+		if ($month >= 7) {
+			$year2=$year+1;
+			$date_asof2=$year2.'-7-31';
+		} else {
+			
+			$date_asof2=$year.'-7-31';
+		}
+		$graphtext= 'Between'.$date_asof2.'and'.$date_asof2;
 		//get available fps at kemsa aggregated
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_monthly_c ) AS sohkemsa,  `fpcommodity_Id` 
@@ -772,7 +802,7 @@ FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
 AND  `transaction_type` =  'SOHKEMSA'
 AND MONTH(  `fp_date` ) =$month
-AND YEAR(  `fp_date` ) =$year_from
+AND YEAR(  `fp_date` ) =$year
 GROUP BY fpcommodity_Id ");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp = array();
@@ -782,15 +812,15 @@ GROUP BY fpcommodity_Id ");
 			$arrayfp[] = $value['fpcommodity_Id'];
 			$arraypending[] = (double)$value['sohkemsa'];
 		}
+		
 		if (count($arraypending)==0) {
-			$arraypending[]=0;
-			$arrayfp[]=0;
+			$arraypending=array(0,0);
+			$arrayfp=array("2","4");
 		} 
+		
 		$arraycombined = array_combine($arrayfp,$arraypending);
 		
-		//var_dump($arraycombined);
-		
-		
+			
 		$commodities = Fpcommodities::getAllfpcommodities();
 		//$rowcount=count($commodities);
 		$arrayfpname = array();
@@ -800,19 +830,12 @@ GROUP BY fpcommodity_Id ");
 		foreach ($commodities as $values) {
 
 			$arrayfpname[$values -> id] = $values -> fp_name;
-//$i++;
-		//}
-	
+
 		}
-		//echo json_encode($arrayfpname);
 		
-		//exit;
-		 
-///error in how combine is done, doesnt quite work, wrong array mapping
 		ksort($arrayfpname);
-		//var_dump($arrayfpname);
 		$basketkemsa = array_replace($arrayfpname, $arraycombined);
-		//ksort($basketkemsa);
+		
 		
 		foreach ($basketkemsa as $key => $val) {
 			if (is_string($val)) {
@@ -831,23 +854,21 @@ GROUP BY fpcommodity_Id ");
 			$array_finalfp[] = $arrayfpname[$key];
 
 		}
-		//var_dump($array_finalfp);
-		//var_dump($array_finalkemsa);
-		//echo $array_finalkemsa = json_encode($array_finalkemsa);
-		//echo $array_finalfp = json_encode($array_finalfp);
-		//exit;
-		//query for second graph psi
+		
+		//query for second graph pending
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT SUM(  `fp_quantity` ) / fpcommodities.projected_monthly_c AS sohpending,  `fpcommodity_Id` 
 FROM pipeline, fpcommodities
 WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
 AND (
-`transaction_type` =  'PENDINGKEMSA'
-OR  `transaction_type` =  'DELAYED'
-)
-AND MONTH(  `fp_date` ) =$month
-AND YEAR(  `fp_date` ) =$year_from
-GROUP BY fpcommodity_Id  ");
+ `transaction_type` =  'PENDINGKEMSA'
+OR  `transaction_type` =  'DELAYED')
+AND  `fp_date` 
+BETWEEN  '$date_asof'
+AND  '$date_asof2'
+AND  `date_incountry` =  '0000-00-00'
+AND  `date_receive` =  '0000-00-00'
+GROUP BY fpcommodity_Id");
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp1 = array();
 		$arraypending1 = array();
@@ -856,10 +877,12 @@ GROUP BY fpcommodity_Id  ");
 			$arrayfp1[] = $value['fpcommodity_Id'];
 			$arraypending1[] = (double)$value['sohpending'];
 		}
+
 if (count($arraypending1)==0) {
-			$arraypending1[]=0;
-			$arrayfp1[]=0;
+			$arraypending1=array(0,0);
+			$arrayfp1=array("2","4");
 		} 
+		
 		 $arraycombine = array_combine($arrayfp1, $arraypending1);
 		//var_dump( $arraycombine);
 		//var_dump( $arraypending1);
@@ -879,11 +902,42 @@ if (count($arraypending1)==0) {
 			$array_finalpend[] = $basketpend[$key];
 
 		}
-		//var_dump($array_finalpsi);
-		//var_dump($array_finalkemsa);
-		//echo $array_finalkemsa = json_encode($array_finalkemsa);
-		//echo $array_finalfp = json_encode($array_finalfp);
-		//exit;
+		
+		$data['graphtext1'] = $date_asof;
+		$data['graphtext2'] = $date_asof2;
+		$data['array_finalkemsa'] = json_encode($array_finalkemsa);
+		$data['array_finalpend'] = json_encode($array_finalpend);
+		$data['arrayfpname'] = json_encode($array_finalfp);
+		$this -> load -> view("ajax_view/kemsa_ajax_v", $data);
+
+	}
+
+public function psi_data() {
+	if ($this->input->post('year_psi') && $this->input->post('monthpsi') ){
+		$year_from=$_POST['year_psi'];		
+	   $month=$_POST['monthpsi'];
+	} else {
+		 $year_from=date('Y');
+	     $month=date('n');
+	}
+		
+		$commodities = Fpcommodities::getAllfpcommodities();
+		//$rowcount=count($commodities);
+		$arrayfpname = array();
+		//for ($i=1; $i <= $rowcount;) { 
+			
+		
+		foreach ($commodities as $values) {
+
+			$arrayfpname[$values -> id] = $values -> fp_name;
+//$i++;
+		//}
+	
+		}
+		
+		ksort($arrayfpname);
+		
+		
 		//query for second graph pending
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute("SELECT SUM(  `fp_quantity` / fpcommodities.projected_psi ) AS sohpsi,  `fpcommodity_Id` 
@@ -897,20 +951,20 @@ GROUP BY fpcommodity_Id  ");
 		
 		$result = $st -> fetchAll(PDO::FETCH_ASSOC);
 		$arrayfp = array();
-		$arraypending = array();
+		$arraypsi = array();
 		
 		foreach ($result as $value) {
 
 			$arrayfp[] = $value['fpcommodity_Id'];
-			$arraypending[] = (double)$value['sohpsi'];
+			$arraypsi[] = (double)$value['sohpsi'];
 		}
-if (count($arraypending)==0) {
-			$arraypending[]=0;
+if (count($arrayfp)==0) {
 			$arrayfp[]=0;
+			$arraypsi[]=0;
 		} 
-		$arraycombined = array_combine($arrayfp, $arraypending);
-
-		$basketpsi = array_replace($arrayfpname, $arraycombined);
+		 $arraycombine = array_combine($arrayfp, $arraypsi);
+		
+		$basketpsi = array_replace($arrayfpname, $arraycombine);
 
 		foreach ($basketpsi as $key => $val) {
 			if (is_string($val)) {
@@ -919,22 +973,25 @@ if (count($arraypending)==0) {
 
 		}
 
+				
 		$array_finalpsi = array();
 		foreach ($basketpsi as $key => $val) {
 
 			$array_finalpsi[] = $basketpsi[$key];
 
 		}
+		foreach ($arrayfpname as $key => $val) {
+
+			$array_finalfp[] = $arrayfpname[$key];
+
+		}
+
 		
-		$array_finalkemsa = json_encode($array_finalkemsa);
-		$array_finalfp = json_encode($array_finalfp);
-		$array_finalpsi = json_encode($array_finalpsi);
-		$array_finalpend = json_encode($array_finalpend);
-		$data['array_finalpsi'] = $array_finalpsi;
-		$data['array_finalkemsa'] = $array_finalkemsa;
-		$data['array_finalpend'] = $array_finalpend;
-		$data['arrayfpname'] = $array_finalfp;
-		$this -> load -> view("ajax_view/kemsa_ajax_v", $data);
+		
+		$data['array_finalpsi'] = json_encode($array_finalpsi);
+		
+		$data['arrayfpname'] = json_encode($array_finalfp);
+		$this -> load -> view("ajax_view/psi_ajax_v", $data);
 
 	}
 

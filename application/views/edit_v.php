@@ -68,7 +68,7 @@
   <div class="control-group">
     <label class="control-label" for="Dateexp">Date Expected</label>
     <div class="controls">
-      <input type="text" id="Dateexp" readonly="readonly" value="<?php echo date('F j, Y ', strtotime($val['fp_date']));?>">
+      <input type="text" id="Dateexp" readonly="readonly" value="<?php echo date('F j Y ', strtotime($val['fp_date']));?>">
     </div>
   </div>
   <div class="control-group">
@@ -76,18 +76,23 @@
     <div class="controls">
       <select id="action" name="action">
       	<option value="0">Select Action</option>
-      	<option value="1">Receive</option>
-      	<option value="2">Delay</option>
+      	<option value="1">Receive-Wait Clearance</option>
+      	<option value="2">Receive-after Clearance</option>
+      	<option value="3">Delay</option>
       </select>
     </div>
   </div>
+  <div class="controls controls-row" id="actionreceive_wait" style=" margin-bottom:1em; ">
+              <input class="span2 dateclass" type="text" placeholder="Receive Date" id="receive_wait" name="receive_wait">
+              <input class="span2" type="text" placeholder="Quantity Received" id="qty_incountry" name="qty_incountry">
+            </div>
   <div class="controls controls-row" id="actionreceive" style=" margin-bottom:1em; ">
-              <input class="span2" type="text" placeholder="Date Received" id="Receive" name="Receive">
+              <input class="span2 dateclass" type="text" placeholder="Date Received" id="Receive" name="Receive">
               <input class="span2" type="text" placeholder="Quantity Received" id="qtyReceive" name="qtyReceive">
             </div>
             
   <div class="controls controls-row" style="margin-top:1em; margin-bottom:1em; " id="actiondelay">
-              <input class="span2" type="text" placeholder="Date delayed to" id="delay" name="delay">
+              <input class="span2 dateclass" type="text" placeholder="Date delayed to" id="delay" name="delay">
               <input class="span3" type="text" placeholder="Comment" id="comment" name="comment">
             </div>
             
@@ -117,20 +122,35 @@ echo form_close();
 				if (radio_value == '1') {
 					$("#actionreceive").show("slow");
 					$("#actiondelay").hide("fast");
+					$("#actionreceive_wait").hide("fast");
 					$('#delay').val('');
 					$('#comment').val('');
+					$('#receive_wait').val('');
+					$('#qty_incountry').val('');
 
-				} else if (radio_value == '2') {
+				} else if (radio_value == '3') {
 					$("#actiondelay").show("slow");
+					$("#actionreceive").hide("fast");
+					$("#actionreceive_wait").hide("fast");
+					$('#Receive').val('');
+					$('#qtyReceive').val('');
+					$('#receive_wait').val('');
+					$('#qty_incountry').val('');
+				}
+				else if (radio_value == '2') {
+					$("#actionreceive_wait").show("slow");
+					$("#actiondelay").hide("fast");
 					$("#actionreceive").hide("fast");
 					$('#Receive').val('');
 					$('#qtyReceive').val('');
+					$('#delay').val('');
+					$('#comment').val('');
 				}
     
   });	
-	$( "#Receive,#delay" ).datepicker({
+	$( ".dateclass" ).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy', 
+			dateFormat: 'd M yy', 
 			
 		});	
  });

@@ -79,7 +79,7 @@
   <div class="control-group">
     <label class="control-label" for="Dateexp">Date Expected</label>
     <div class="controls">
-      <input type="text" id="Dateexp" name="Dateexp" class="my_date" value="<?php echo date('F j, Y ', strtotime($val['fp_date']));?>">
+      <input type="text" id="Dateexp" name="Dateexp" class="my_date" value="<?php echo date('F j Y ', strtotime($val['fp_date']));?>">
     </div>
   </div>
   
@@ -104,7 +104,7 @@ echo form_close();
 		
 		$( ".my_date" ).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy', 
+			dateFormat: 'd M yy', 
 			
 		});
  });

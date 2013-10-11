@@ -32,7 +32,7 @@
     
     $( ".my_date" ).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy', 
+			dateFormat: 'd M yy', 
 			
 		});
 		

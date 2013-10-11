@@ -39,8 +39,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 	
 </style>
   <div class="sub-menu">
-  		<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan">New Supply Plan</a>
-        <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan_vs_actual">View Supply Plan Vs Actual</a>      
+  		<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management">Back</a>
             </div>
   <div class="edit_plan">
   	<h2>
@@ -98,12 +97,21 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 	</tr>
 	</thead>
 	<tbody>	<?php 
+					if ($mycount==0) {
+						echo "<tr><td colspan='7' style='font-size: 14px; text-align:center;'> No data available for this Month/Year</td></tr>";
+							
+						} ?>
+						
+						<?php 
+	
 		foreach ($kemsa_psi as  $value) {
 			
 		
 		?>
+		
 					
 						<tr style="font-size: 12px">
+							
 							<td><?php echo $value['fp_name'];?></td>
 							<td><?php echo $value['Unit'];?></td>
 							<td><?php echo number_format($value['fp_quantity']);?></td>
@@ -135,6 +143,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
   	$(document).ready(function() {
 	$(function() {
   	 $('#filter').click(function() {
+  	 	
          var div="#table_filtered";
 		var url = "<?php echo base_url()."Fp_management/soh_filtered"?>";		
 		//url=url+"/"+$("#commoditychange").val();

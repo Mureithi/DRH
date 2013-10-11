@@ -69,14 +69,14 @@
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Quantity</th>
-		<th>Action</th>
+		<th>Status | Action</th>
 		
 	</tr>
 	</thead>
 	<tbody>
 		<?php 
 		foreach ($supplyplan as $val ) {
-			
+			$id=$val['tr_id'];
 			
 		?>						
 						<tr style="font-size: 12px">
@@ -85,7 +85,21 @@
 							<td><?php echo $val['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
 							<td><?php echo number_format($val['fp_quantity']);?></td>
-							<td><button class="btn btn-success Editable" id="<?php echo $val['tr_id'];?>" value="" >Edit</button></td>
+							<td><?php if ($val['transaction_type']=='PENDINGKEMSA') {
+								echo "<button class='btn btn-mini btn-warning'  >Pending</button>
+								<button class='btn btn-mini btn-success Editable' id='$id'>Edit</button>";
+							} elseif($val['transaction_type']=='INCOUNTRY') {
+								echo "<button class='btn btn-mini btn-success' >Not Cleared</button>
+								<button class='btn btn-mini btn-success Editable' id='$id' >Edit</button>";
+							}elseif($val['transaction_type']=='DELAYED') {
+								echo "<button class='btn btn-mini btn-danger'  >Delayed</button>'
+								<button class='btn btn-mini btn-success Editable' id='$id'>Edit</button>";
+							}elseif($val['transaction_type']=='RECEIVED') {
+								echo "<button class='btn btn-mini btn-success'  >Received</button>'
+								<button class='btn btn-mini btn-success disabled' id='$id'>Edit</button>";
+							}
+							 ?>
+							</td>
 							
 					   </tr>
 					   
@@ -100,6 +114,7 @@
 
   <script>
   	$(document).ready(function() {
+  		$('.Editable').attr('disabled');
 	$(function() {
   	 $('#filter').click(function() {
          var div="#table_filtered";

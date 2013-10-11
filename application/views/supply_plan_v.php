@@ -44,6 +44,7 @@ $(document).ready(function() {
             },
             series: [ {
                 name: 'Supply Plan (<?php echo $commodityname ?>)',
+                type: <?php echo $graphtype ?>,
                 data: <?php echo $arrayto_graph ?>
             }, {
                 name: 'Actual MOS (<?php echo $commodityname ?>)',
@@ -52,6 +53,7 @@ $(document).ready(function() {
             },
             {
                 name: 'Supply Plan (<?php echo $commodityname2 ?>)',
+                type: <?php echo $graphtype ?>,
                 data: <?php echo $arrayto_graph2 ?>
             }, {
                 name: 'Actual MOS (<?php echo $commodityname2 ?>)',

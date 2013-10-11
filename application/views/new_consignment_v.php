@@ -32,7 +32,7 @@
     
     $( ".my_date" ).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy', 
+			dateFormat: 'd M yy', 
 			
 		});
 		
@@ -45,7 +45,7 @@
         $(this).removeClass('hasDatepicker'); // remove hasDatepicker class
         $(this).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy',
+			dateFormat: 'd M yy',
 				}); // re-init datepicker
 				counter++;
 		});
@@ -79,6 +79,7 @@
 		<th>Unit</th>
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
+		<th>Procuring Agency</th>
 		<th>Quantity</th>
 		<th rowspan="2" >+/-</th>
 		<th></th>
@@ -103,15 +104,26 @@
 							<td><select  id="funding_source[]" name="funding_source[]" >
     <option>Select Funding Source</option>
 		<?php 
-		foreach ($fundingsource as $fundingsource) {
-			$id=$fundingsource->id;
-			$source=$fundingsource->funding_source;
+		foreach ($fundingsource as $fundingsource1) {
+			$id=$fundingsource1->id;
+			$source=$fundingsource1->funding_source;
 			?>
 			<option value="<?php echo $id;?>"><?php echo $source;?></option>
 		<?php }
 		?>
 	</select> </td>
 							<td><input type="text" id="etadetails" name="etadetails[]" class="my_date" placeholder="Date"></td>
+							<td><select type="text" id="procureA" name="procureA[]" class="" placeholder="">
+								<option>Select Procurement Agency</option>
+		<?php 
+		foreach ($fundingsource as $fundingsource2) {
+			$ids=$fundingsource2->id;
+			$agency=$fundingsource2->funding_source;
+			?>
+			<option value="<?php echo $ids;?>"><?php echo $agency;?></option>
+		<?php }
+		?>
+							</select></td>
 							<td><input type="text" id="quantity[]" name="quantity[]" placeholder="Quantity"></td>
 							
 							<td><a class="btn " href="#" id="btnAdd">+</a></td>
@@ -120,16 +132,10 @@
 							
 							
 					   </tr>
-					   
-					   
-						
 		</tbody>
-		
-			
 	 
 </table>
-    </div>
-   
+    </div>   
   <div class="modal-footer">
     <button class="btn">Cancel</button>
     <button class="btn btn-primary" id="" name="">Submit</button>

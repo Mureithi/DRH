@@ -105,6 +105,11 @@ li a{
           var div=".reportsdisplay";  
 		ajax_request (url,div);
     });
+    $("#pipeline_settings").click(function(){
+      var url = "<?php echo base_url().'Settings/pipeline_s'?>";      
+          var div=".reportsdisplay";  
+		ajax_request (url,div);
+    });
     
     function ajax_request (url,div){
 	var url =url;
@@ -132,6 +137,7 @@ li a{
       	<li id="plan_settings" class="active">Supply Plan</li>
       	<li id="fp_settings">Fp Commodities</li>
       	<li id="soh_settings">Stock On Hand</li>
+      	<li id="pipeline_settings">Pipeline</li>
       	
      	 </ul>
       </div>

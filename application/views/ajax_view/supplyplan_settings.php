@@ -49,7 +49,7 @@
 							<td><?php echo $val['Unit'];?></td>
 							<td><?php echo $val['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
-							<td><?php echo number_format($val['fp_quantity']);?></td>
+							<td><?php echo $val['fp_quantity'];?></td>
 							<td><button class="btn btn-mini btn-success Editable" id="<?php echo $val['tr_id'];?>" value="" >Edit <i class="icon-edit"></i></button>|
 								<button class="btn btn-mini btn-danger delete" id="<?php echo $val['tr_id'];?>" value="" >Delete <i class="icon-remove-sign"></i></button>
 							</td>

@@ -1,9 +1,6 @@
+<script src="<?php echo base_url().'Scripts/highcharts.js'?>" type="text/javascript"></script>
+<script src="<?php echo base_url().'Scripts/exporting.js'?>" type="text/javascript"></script>
 <style>
-	.contain_kemsa{
-		width: 100%;
-		height:280px;
-		float:left;
-	}
 	
 	.kemsa{
 		
@@ -13,75 +10,35 @@
 		
 	}
 	
-	.mos_kemsa{
-		width: 48%;
+	#mos_kemsa{
+		width: 100%;
 		height:260px;
 		float:left;
 		margin:auto;
 	}
-	.mos_psi{
-		width: 48%;
-		height:260px;
-		float:left;
-		margin:auto;
-	}
-	
-	
+		
 </style>
 <script>
-	$(document).ready(function() {
-		
-		 $('.mos_psi').highcharts({
-        	colors: [
-		'#8bbc21',
-		'#910000'
-		],
-            chart: {
-            	height:250,
-                type: 'bar'
-            },
-            title: {
-                text: 'Stock Status of FP Commodities in Private Sector Pipeline (2013-2014)'
-            },plotOptions: {
-                series: {
-                    stacking: 'normal'
-                }
-            },
-            xAxis: {
-                categories: <?php echo $arrayfpname ?>
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: 'Months of stock(MOS)'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                borderWidth: 0
-            },
-          credits: {
-		enabled: false
-		},
-                series: [{
-                name: 'Stores MOS',
-                data: <?php echo $array_finalpsi ?>
-            } ]
-        	});
+
+var chart;
+	$(document).ready(function() {	
 	
-         $('.mos_kemsa').highcharts({
-        	
-            chart: {
-            	height:250,
-                type: 'bar'
-            },
-            title: {
-                text: 'Stock Status of FP Commodities in Public Sector Pipeline (2013-2014)'
+        
+         var mos_kemsa = new Highcharts.Chart({
+		chart: {
+				renderTo: 'mos_kemsa',
+						
+						type: 'bar',
+						height: 250
+						
+						
+					},
+					title: {
+                text: 'Stock Status in Public Sector Pipeline Between <?php echo  date('F j, Y ', strtotime($graphtext1)) ?> & <?php echo date('F j, Y ', strtotime($graphtext2)) ?>'
             },
             subtitle: {
-                text: 'Source: DRH,KEMSA,NASCOP,UNFPA,KfW,USAID,DFID,LMU'
+                text: 'Source: DRH,KEMSA,NASCOP,UNFPA,KfW,USAID,DFID,LMU',
+                
             },
             xAxis: [{
                 categories: <?php echo $arrayfpname ?>
@@ -94,7 +51,7 @@
             },plotOptions: {
                 series: {
                     stacking: 'normal'
-                }
+                },
             },
             legend: {
                 layout: 'vertical',
@@ -112,16 +69,13 @@
                 name: 'Actual Stocks',
                 data: <?php echo $array_finalkemsa ?>
             }]
-        	});
+				});
         
         });
 	
 </script>
-<div class="contain_kemsa">
-<div class="mos_kemsa">
-	
-</div>
-<div class="mos_psi">
+
+<div id="mos_kemsa">
 	
 </div>
 
@@ -151,5 +105,4 @@
     				
   				</div>
   				</div>
-</div>
 </div>

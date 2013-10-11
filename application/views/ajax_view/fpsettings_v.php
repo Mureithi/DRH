@@ -86,7 +86,7 @@
   <div class="control-group">
     <label class="control-label" for="Date_of">Date as Of</label>
     <div class="controls">
-      <input type="text" id="Date_of" name="Date_of" class="my_date" value="<?php echo  date('F j, Y ', strtotime($val->as_of));?>">
+      <input type="text" id="Date_of" name="Date_of" class="my_date" value="<?php echo  date('F j Y ', strtotime($val->as_of));?>">
     </div>
   </div>
   
@@ -112,7 +112,7 @@ echo form_close();
 		$('#fpcommodity').attr("disabled", true);
 		$( ".my_date" ).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy', 
+			dateFormat: 'd M yy', 
 			
 		});
  });
