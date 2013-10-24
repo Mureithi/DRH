@@ -76,9 +76,10 @@
     <div class="controls">
       <select id="action" name="action">
       	<option value="0">Select Action</option>
-      	<option value="1">Receive-Wait Clearance</option>
-      	<option value="2">Receive-after Clearance</option>
+      	<option value="1">Arrived Awaiting clearance</option>
+      	<option value="2">Receive- In Store</option>
       	<option value="3">Delay</option>
+      	<option value="4">Cancel</option>
       </select>
     </div>
   </div>
@@ -86,6 +87,9 @@
               <input class="span2 dateclass" type="text" placeholder="Receive Date" id="receive_wait" name="receive_wait">
               <input class="span2" type="text" placeholder="Quantity Received" id="qty_incountry" name="qty_incountry">
             </div>
+            <div class="controls controls-row" id="cancel" style=" margin-bottom:1em; ">
+              <input class="span2 dateclass" type="text" placeholder="Cancel Date" id="cancel_date" name="cancel_date">
+               </div>
   <div class="controls controls-row" id="actionreceive" style=" margin-bottom:1em; ">
               <input class="span2 dateclass" type="text" placeholder="Date Received" id="Receive" name="Receive">
               <input class="span2" type="text" placeholder="Quantity Received" id="qtyReceive" name="qtyReceive">
@@ -114,6 +118,7 @@ echo form_close();
 	$(function() {
 		$("#actionreceive").hide()
 		$("#actiondelay").hide()
+		$("#cancel").hide("slow");
   	 
 	$("#action").change(function(){
 		
@@ -122,23 +127,38 @@ echo form_close();
 				if (radio_value == '1') {
 					$("#actionreceive").show("slow");
 					$("#actiondelay").hide("fast");
+					$("#cancel").hide("slow");
 					$("#actionreceive_wait").hide("fast");
 					$('#delay').val('');
 					$('#comment').val('');
 					$('#receive_wait').val('');
 					$('#qty_incountry').val('');
+					$('#cancel_date').val('');
 
 				} else if (radio_value == '3') {
 					$("#actiondelay").show("slow");
 					$("#actionreceive").hide("fast");
+					$("#cancel").hide("slow");
 					$("#actionreceive_wait").hide("fast");
 					$('#Receive').val('');
 					$('#qtyReceive').val('');
 					$('#receive_wait').val('');
 					$('#qty_incountry').val('');
+					$('#cancel_date').val('');
 				}
 				else if (radio_value == '2') {
 					$("#actionreceive_wait").show("slow");
+					$("#cancel").hide("slow");
+					$("#actiondelay").hide("fast");
+					$("#actionreceive").hide("fast");
+					$('#Receive').val('');
+					$('#qtyReceive').val('');
+					$('#delay').val('');
+					$('#cancel_date').val('');
+					$('#comment').val('');
+				}else if (radio_value == '4') {
+					$("#cancel").show("slow");
+					$("#actionreceive_wait").hide("slow");
 					$("#actiondelay").hide("fast");
 					$("#actionreceive").hide("fast");
 					$('#Receive').val('');

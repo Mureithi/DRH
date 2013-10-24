@@ -15,25 +15,38 @@ public function index() {
 
 
 			
-public function getstock_summary($year,$month){
-	
-		if ($month >= 7) {
-			$year1=$year;
-			$year2=$year+1;
-			$fyear=$year1.'-'.$year2;
+public function getstock_summary($dateof){
+		//$date_of=date('Y-m-d',strtotime($dateof));
+		$split_date=explode('%20', $dateof);
+		$day=$split_date[0];
+		$month=$split_date[1];
+		$year=$split_date[2];
+		//echo $day.'-'.$month.'-'.$year;
+		$date_now=date('Y-m-d',strtotime($year.'-'.$month.'-'.$day)); 
+		$date_next=date('Y-m-d',strtotime(($year+2).'-'.$month.'-'.$day));
+		//exit;
+			$split_date2=explode('-', $date_now);
+			$month2=$split_date2[1];
+			
+		if ($month2 >= 7) {
+			$year1=$year+1;
+			$fyear=$year.'-'.$year1;
+			
 		} else {
 			$year1=$year-1;
-			$year2=$year;
-			$fyear=$year1.'-'.$year2;
+			 $fyear=$year.'-'.$year1;
+			
 		}
 		
+	
 		$report_name='Family Planning Commodities ';
-		$report = Pipeline::getsummary_monthly($year,$month);
+		$report = Pipeline::getsummary_monthly($date_now,$date_next,$month);
 		$report2 = Pipeline::getsummary_plan($fyear);
 		
-		//echo var_dump($report);
-		//echo var_dump($report2);
-		//exit;
+		
+		$finaldate=$date_now;
+		$as_at = date('F, Y ', strtotime($finaldate));
+		
 		$title='DRH';
 		
 			
@@ -338,7 +351,9 @@ table th[class*="span"],
 		
 		/*****************************setting up the report*******************************************/
 
-$html_data1 .='<table class="table table-bordered table-striped">
+$html_data1 .='
+
+<table class="table table-bordered table-striped">
 
 			<thead style="font-size: 13px; background: #C8D2E4 ">
 			<tr>
@@ -406,7 +421,7 @@ $html_data1 .='<table class="table table-bordered table-striped">
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Date Received</th>
-		<th>Date Delayed</th>
+		<th>Revised ETA</th>
 		<th>No Days Delayed</th>
 		<th>Quantity Expected</th>
 		<th>Quantity Received</th>
@@ -477,11 +492,11 @@ if ($val['delay_to']=='0000-00-00'||$val['delay_to']=='1970-01-01') {
 		//echo $html_data;
 		//exit;
          
-	  	$this->generatescc_pdf($report_name,$title,$html_data);
+	  	$this->generatescc_pdf($report_name,$title,$html_data,$as_at);
 		
 				
 			}
-public function generatescc_pdf($report_name,$title,$html_data)
+public function generatescc_pdf($report_name,$title,$html_data,$as_at)
 {
 		/********************************************setting the report title*********************/
 			
@@ -490,22 +505,24 @@ public function generatescc_pdf($report_name,$title,$html_data)
      	<span style='text-align:center;' >
        <h2 style='text-align:center; font-size: 15px;'>Division Of Reproductive Health</h2>
       
-       <h2 style='text-align:center; font-size: 14px;'>Family Planning Commodities Stock Status Report For End of</h2>
+       <h2 style='text-align:center; font-size: 14px;'>Family Planning Commodities Stock Status Report For End of $as_at</h2>
       
-       <hr /> 
-       
-         ";
-			$stylesheet=base_url().'CSS/bootstrap.css';	
+       <hr />  ";
+	   
+	   $timestamp=date("F j, Y, g:i a");
+		 			$stylesheet=base_url().'CSS/bootstrap.css';	
 			
 				///**********************************initializing the report **********************/
 		//$stylesheet = file_get_contents($stylesheet);
             $this->load->library('mpdf');
            $this->mpdf = new mPDF('', 'A4-L', 0, '', 15, 15, 16, 16, 9, 9, '');
+		   $this->mpdf->SetHTMLHeader("<div align='right' style='padding-bottom:20px;'> $timestamp</div>") ;
+		   $this->mpdf->SetHTMLFooter('<div align="right">{PAGENO}</div>') ;
            $this->mpdf->SetTitle($title);
            $this->mpdf->WriteHTML($html_title);
 		    $this->mpdf->simpleTables = true;
             $this->mpdf->WriteHTML('<br/>');
-            $this->mpdf->WriteHTML($html_data);
+			$this->mpdf->WriteHTML($html_data);
 			$report_name = $report_name.".pdf";
            $this->mpdf->Output($report_name,'D');
 			

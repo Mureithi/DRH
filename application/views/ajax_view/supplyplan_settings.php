@@ -1,3 +1,11 @@
+<script type="text/javascript" language="javascript" src="<?php echo base_url(); ?>Scripts/jquery.dataTables.js"></script>
+		<script type="text/javascript" charset="utf-8" src="<?php echo base_url(); ?>DataTables-1.9.3/extras/TableTools-2.0.0/media/js/ZeroClipboard.js"></script>
+		<script type="text/javascript" charset="utf-8" src="<?php echo base_url(); ?>DataTables-1.9.3/extras/TableTools-2.0.0/media/js/TableTools.js"></script>
+		<style type="text/css" title="currentStyle">
+			
+			@import "<?php echo base_url(); ?>DataTables-1.9.3 /media/css/jquery.dataTables.css";
+			@import "<?php echo base_url(); ?>DataTables-1.9.3/extras/TableTools-2.0.0/media/css/TableTools.css";
+		</style>
 <div class="edit_plan">
   <!--	<h2>
 		
@@ -24,7 +32,7 @@
 
 	</h2>
 <div id="table_filtered">
-<table class="table table-hover table-bordered">
+<table id="example" class="table table-hover table-bordered">
 		
      	
 		<thead style="font-size: 13px; background: #C8D2E4 ">
@@ -34,6 +42,8 @@
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Quantity</th>
+		<th>Pending as of</th>
+		<th>Status</th>
 		<th>Action</th>
 		
 	</tr>
@@ -50,6 +60,17 @@
 							<td><?php echo $val['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
 							<td><?php echo $val['fp_quantity'];?></td>
+							<td><?php echo date('F j, Y ', strtotime($val['pending_as_of']));?></td>
+							<td><?php if ($val['transaction_type']=='INCOUNTRY') {
+								echo 'Arrived Awaiting clearance';
+							} elseif($val['transaction_type']=='RECEIVED') {
+								echo 'Received - Complete';
+							}elseif($val['transaction_type']=='PENDINGKEMSA') {
+								echo 'Pending';
+							}elseif($val['transaction_type']=='DELAYED') {
+								echo 'Delayed';
+							}
+							 ?></td>
 							<td><button class="btn btn-mini btn-success Editable" id="<?php echo $val['tr_id'];?>" value="" >Edit <i class="icon-edit"></i></button>|
 								<button class="btn btn-mini btn-danger delete" id="<?php echo $val['tr_id'];?>" value="" >Delete <i class="icon-remove-sign"></i></button>
 							</td>
@@ -99,6 +120,27 @@
         });
          
 }
+jQuery.fn.dataTableExt.oSort['string-case-asc']  = function(x,y) {
+				return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+			};
+			
+			jQuery.fn.dataTableExt.oSort['string-case-desc'] = function(x,y) {
+				return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+			};
+			
+			$(document).ready(function() {
+				/* Build the DataTable with third column using our custom sort functions */
+				$('#example').dataTable( {
+			 "bSort": false,
+					"bJQueryUI": true,
+                   "bPaginate": true,
+                    "sDom": '<"H"Tfr>t<"F"ip>',
+					"oTableTools": {
+			"sSwfPath": "<?php echo base_url(); ?>DataTables-1.9.3/extras/TableTools-2.0.0/media/swf/copy_cvs_xls_pdf.swf"
+		}
+				} );
+			} );
+			
 
  	 $('.Editable').click(function() {
           alert("You are about to edit this field,Proceed?");

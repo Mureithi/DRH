@@ -45,7 +45,7 @@
         $(this).removeClass('hasDatepicker'); // remove hasDatepicker class
         $(this).datepicker({
 			showAnim:'drop',
-			dateFormat: 'd M, yy',
+			dateFormat: 'd M yy',
 				}); // re-init datepicker
 				counter++;
 		});

@@ -74,9 +74,8 @@
 			</tr>
 		</thead>
 		<thead style="font-size: 13px; background: #C8D2E4 ">
-	<tr>
+	<tr><th>Store</th>
 		<th>FP Commodity</th>
-		<th>Unit</th>
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Procuring Agency</th>
@@ -89,8 +88,13 @@
 	<tbody>	
 					
 						<tr class="clonedtr" style="font-size: 12px">
+							<td><select id="store[]" name="store[]">
+								<option value="0">Select Store</option>
+								<option value="1">KEMSA</option>
+								<option value="2">PSI</option>
+							</select></td>
 							<td><select  id="pipecommodity[]" name="pipecommodity[]" >
-    <option>Select Commodity</option>
+    <option value="0">Select Commodity</option>
 		<?php 
 		foreach ($fpcommodity as $fpcommodity2) {
 			$id=$fpcommodity2->id;
@@ -100,9 +104,9 @@
 		<?php }
 		?>
 	</select> </td>
-							<td></td>
+							
 							<td><select  id="funding_source[]" name="funding_source[]" >
-    <option>Select Funding Source</option>
+    <option value="0">Select Funding Source</option>
 		<?php 
 		foreach ($fundingsource as $fundingsource1) {
 			$id=$fundingsource1->id;
@@ -114,7 +118,7 @@
 	</select> </td>
 							<td><input type="text" id="etadetails" name="etadetails[]" class="my_date" placeholder="Date"></td>
 							<td><select type="text" id="procureA" name="procureA[]" class="" placeholder="">
-								<option>Select Procurement Agency</option>
+								<option value="0">Select Procurement Agency</option>
 		<?php 
 		foreach ($fundingsource as $fundingsource2) {
 			$ids=$fundingsource2->id;
@@ -125,9 +129,8 @@
 		?>
 							</select></td>
 							<td><input type="text" id="quantity[]" name="quantity[]" placeholder="Quantity"></td>
-							
-							<td><a class="btn " href="#" id="btnAdd">+</a></td>
-							<td><a class="btn btn-primary btnDel " href="#">-</a></td>
+							<td><a class="btn btn-mini" href="#" id="btnAdd">+</a></td>
+							<td><a class="btn btn-mini btn-primary btnDel " href="#">-</a></td>
 
 							
 							

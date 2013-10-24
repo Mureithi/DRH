@@ -91,7 +91,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 		<th>Actual SOH</th>
 		<th>SOH in M.O.S</th>
 		<th>Projected Consumption</th>
-		<th>Financial Year</th>
+		<th>Date as of</th>
 		<th>Status</th>
 		
 	</tr>
@@ -117,7 +117,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 							<td><?php echo number_format($value['fp_quantity']);?></td>
 							<td><?php echo $value['sohkemsa'];?></td>
 							<td><?php echo number_format($value['projected_monthly_c']);?></td>
-							<td><?php echo $value['fp_date']; ;?></td>
+							<td><?php echo date('F j, Y ',strtotime($value['fp_date'])); ;?></td>
 							<td><?php if ($value['transaction_type']=='PENDINGKEMSA') {
 								echo '<button class="btn btn-mini btn-warning" id="" name="" >Pending</button>';
 							} elseif($value['transaction_type']=='INCOUNTRY') {

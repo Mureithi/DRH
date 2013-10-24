@@ -68,23 +68,38 @@ public function delete_transaction($trid) {
 		$FSource=$_POST['FSource'];		
 	    $Quantityexp=$_POST['Quantityexp'];
 		$Dateexp=$_POST['Dateexp'];
+		$pending=$_POST['pending'];
+		$Date_of=$_POST['Date_receive'];
+		$status=$_POST['status'];	
+		$datepend=date('y-m-d',strtotime($pending));
 		$date=date('y-m-d',strtotime($Dateexp));
+		$ddate=date('y-m-d',strtotime($Date_of));
 		
-		//echo $Dateexp;
-		//echo strtotime('16 Apr 2014');
-		//echo '<br/>';
-		//echo strtotime($Dateexp);
-		//exit;
+		if ($status==1) {
+			$transaction='INCOUNTRY';
+			
+		}elseif($status==2) {
+			 $transaction='RECEIVED';
+			
+		}elseif($status==3) {
+			 $transaction='RECEIVED';
+			
+		}elseif($status==4) {
+			 $transaction='RECEIVED';
+			
+		}
 		
 				
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET  `funding_source` =  '$FSource', `fp_quantity` =  '$Quantityexp', `fp_date` =  '$date' WHERE  `pipeline`.`id` =$trid; ");
+		$st = $con -> execute(" UPDATE  `drh`.`pipeline` SET `transaction_type` = '$transaction', `funding_source` =  '$FSource', `fp_quantity` =  '$Quantityexp', `pending_as_of` =  '$datepend', `date_receive` = '$ddate', `fp_date` =  '$date' WHERE  `pipeline`.`id` =$trid; ");
 		
 			
 		$this->session->set_flashdata('system_success_message', "Record Updated");
 		redirect('settings');
+		
+		
+		}
 
-	}
 public function edit_fptransaction($fpid) {
 		
 		$data['content_view'] = "ajax_view/fpsettings_v";
@@ -180,7 +195,7 @@ public function delete_soh($fpid) {
 	}
 public function update_soh() {
 		$quantity=$_POST['Quantity'];
-		 $fp_name=$_POST['fp_name'];	
+		$fp_name=$_POST['fp_name'];	
 	    $trid=$_POST['trid'];	
 		$Date_of=$_POST['Date_of'];
 		$Store=$_POST['Store'];
@@ -203,21 +218,21 @@ public function update_soh() {
 	
 	public function update_pipeline() {
 		$quantity=$_POST['Quantity'];
-		 $fp_name=$_POST['fp_name'];	
+		$status=$_POST['status'];	
 	    $trid=$_POST['trid'];	
-		$Date_of=$_POST['Date_of'];
-		$Store=$_POST['Store'];
+		$Date_of=$_POST['Date_receive'];
+		$fp_name=$_POST['fp_name'];	
 		$ddate=date('y-m-d',strtotime($Date_of));
 		
-			if ($Store=='KEMSA') {
-			$transaction='SOHKEMSA';
+			if ($status==1) {
+			$transaction='INCOUNTRY';
 			
 		}else {
-			 $transaction='SOHPSI';
+			 $transaction='RECEIVED';
 			
 		}
 		$con = Doctrine_Manager::getInstance() -> connection();
-		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `transaction_type` = '$transaction', `fp_quantity`='$quantity' ,`fp_date` = '$ddate' WHERE  `pipeline`.`id` ='$trid'; ");
+		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `transaction_type` = '$transaction', `fp_quantity`='$quantity' ,`date_receive` = '$ddate' WHERE  `pipeline`.`id` ='$trid'; ");
 		
 		$this->session->set_flashdata('system_success_message', "You edited $fp_name ");
 		redirect('settings');

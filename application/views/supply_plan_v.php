@@ -8,7 +8,7 @@ $(document).ready(function() {
 	
 	    $('#content').highcharts({
               title: {
-                text: 'Supply Plan Vs Actual M.O.S for <?php echo $commodityname ?> & <?php echo $commodityname2 ?>',
+                text: 'Supply Plan Vs Actual M.O.S for <?php echo $commodityname ?>',
                 x: -20 //center
             },
             subtitle: {
@@ -50,15 +50,6 @@ $(document).ready(function() {
                 name: 'Actual MOS (<?php echo $commodityname ?>)',
                 type: 'column',
                 data: <?php echo $arrayactual ?>
-            },
-            {
-                name: 'Supply Plan (<?php echo $commodityname2 ?>)',
-                type: <?php echo $graphtype ?>,
-                data: <?php echo $arrayto_graph2 ?>
-            }, {
-                name: 'Actual MOS (<?php echo $commodityname2 ?>)',
-                type: 'column',
-                data: <?php echo $arrayactual2 ?>
             }]
        		 });
        

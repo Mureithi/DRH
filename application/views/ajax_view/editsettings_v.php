@@ -73,13 +73,39 @@
   <div class="control-group">
     <label class="control-label" for="Quantityexp">Quantity Expected</label>
     <div class="controls">
-      <input type="text"  id="Quantityexp" name="Quantityexp" value="<?php echo number_format($val['fp_quantity']);?>">
+      <input type="text"  id="Quantityexp" name="Quantityexp" value="<?php echo $val['fp_quantity'];?>">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="Store">Status</label>
+    <div class="controls">
+     <select  id="status" name="status" >
+   			 <option value="0">Select Status</option>
+			<option value="1">Received - Not Cleared</option>
+			<option value="2">Received - In Store</option>
+			<option value="3">Pending</option>
+			<option value="4">Delayed</option>
+			
+		
+	</select>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="pending">Pending as of</label>
+    <div class="controls">
+      <input type="text"  id="pending" name="pending" class="my_date"  value="<?php echo date('F j Y ', strtotime($val['pending_as_of']));?>">
     </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="Dateexp">Date Expected</label>
     <div class="controls">
       <input type="text" id="Dateexp" name="Dateexp" class="my_date" value="<?php echo date('F j Y ', strtotime($val['fp_date']));?>">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="Date_of">Date Received</label>
+    <div class="controls">
+      <input type="text" id="Date_receive" name="Date_receive" class="my_date" value="<?php echo  date('F j Y ', strtotime($val['date_receive']));?>">
     </div>
   </div>
   
@@ -100,6 +126,16 @@ echo form_close();
   <script>
   	$(document).ready(function() {
 	$(function() {
+		$("#status").val(<?php if ($val['transaction_type']=='INCOUNTRY') {
+								echo '1';
+							} elseif($val['transaction_type']=='RECEIVED') {
+								echo '2';
+							}elseif($val['transaction_type']=='PENDINGKEMSA') {
+								echo '3';
+							}elseif($val['transaction_type']=='DELAYED') {
+								echo '4';
+							}
+							 ?>)
 		$("#FSource").val(<?php echo $val['funding_id'];?>)
 		
 		$( ".my_date" ).datepicker({

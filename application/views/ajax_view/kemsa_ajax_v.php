@@ -34,7 +34,7 @@ var chart;
 						
 					},
 					title: {
-                text: 'Stock Status in Public Sector Pipeline Between <?php echo  date('F j, Y ', strtotime($graphtext1)) ?> & <?php echo date('F j, Y ', strtotime($graphtext2)) ?>'
+                text: 'Stock Status in Public Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?> & <?php echo date('F , Y ', strtotime($graphtext2)) ?>'
             },
             subtitle: {
                 text: 'Source: DRH,KEMSA,NASCOP,UNFPA,KfW,USAID,DFID,LMU',
@@ -64,9 +64,11 @@ var chart;
 		},
                 series: [{
                 name: 'Pending Stocks',
+                 pointWidth: 9,
                 data: <?php echo $array_finalpend ?>
             } ,{
                 name: 'Actual Stocks',
+                 pointWidth: 9,
                 data: <?php echo $array_finalkemsa ?>
             }]
 				});

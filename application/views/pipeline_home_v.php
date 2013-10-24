@@ -14,9 +14,10 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 .higherWider {
     height: 100%;
     overflow-y: auto;
-    width: 72%;
+    width: 75%;
    margin-left: -35%;
-   max-height: 800px;
+   max-height: 900px;
+   max-width: 1500px;
 }
 	
 	.pipeline_data{
@@ -75,7 +76,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_home">Enter Stocks on Hand</a>
 <!--<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan">Supply Plan</a>-->
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/editsupply_plan">Update Supply Plan</a>
-<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH</a>
+<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH-KEMSA</a>
 <button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#supplyplanModal">View Supply Plan</button>
 <button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#downloadModal">Downloads</button>
 
@@ -90,7 +91,8 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
               <input class="span2 dateclass" type="text" placeholder="Date as of" id="as_of" name="as_of">
               
 	<button class="btn btn-small btn-success" id="filter_kemsa" name="filter_kemsa" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
-	<!--<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply  Plan Vs Actual</a>-->
+	<button class="btn btn-mini btn-success enlarge" id="kemsa-more" name="kemsa-more" style="margin-left: 1em;">Enlarge <i class=" icon-zoom-in"></i></button> 
+	<button class="btn btn-mini btn-success enlarge" id="kemsa-less" name="kemsa-less" style="margin-left: 1em;">Return <i class=" icon-zoom-out"></i></button> 
 
 	</h2>
             	<div class="mos_kemsa">
@@ -100,36 +102,13 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
             	
             	<div class="containpsi">
             		<h2>
-		<select name="monthpsi" id="monthpsi">
-			<option>Select Month</option>
-		<?php 
-		for ($i=1; $i < 12 ; ) { 
-			
-		foreach ($montharray as $key => $val) {
-			
-			$year=$montharray[$key];
-			
-			?>
-			<option value="<?php echo $i;?>"><?php echo $year;?></option>
-			
-		<?php $i++;}
-		}
-		?>
-		</select>
+		
 		 
-		<select name="year_psi" id="year_psi">
-			<option>Select Year</option>
-			<?php
-		for($x=$current_year;$x>=$earliest_year;$x--){
-			?>
-			<option value="<?php echo $x;?>"
-			<?php
-			if ($x == $current_year) {echo "selected";
-			}
-			?>><?php echo $x;?></option>
-			<?php }?>
-		</select>
+		<input class="span2 dateclass" type="text" placeholder="Date as of" id="as_of_psi" name="as_of_psi">
 	<button class="btn btn-small btn-success" id="filter_psi" name="filter_psi" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
+	<button class="btn btn-mini btn-success enlarge" id="psi-more" name="psi-more" style="margin-left: 1em;">Enlarge <i class=" icon-zoom-in"></i></button> 
+	<button class="btn btn-mini btn-success enlarge" id="psi-less" name="psi-less" style="margin-left: 1em;">Return <i class=" icon-zoom-out"></i></button>
+	
 	<!--<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply  Plan Vs Actual</a>-->
 
 	</h2>
@@ -149,17 +128,6 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 		foreach ($fpcommodity as $fpcommodity1) {
 			$id=$fpcommodity1->id;
 			$commodity=$fpcommodity1->fp_name;
-			?>
-			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
-		<?php }
-		?>
-	</select> 
-	<select  id="commoditychange2" name="commoditychange2" >
-    <option value="0">Select Commodity</option>
-		<?php 
-		foreach ($fpcommodity as $fpcommodity2) {
-			$id=$fpcommodity2->id;
-			$commodity=$fpcommodity2->fp_name;
 			?>
 			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
 		<?php }
@@ -193,44 +161,13 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
     <div class="form-horizontal">
     	
   <div class="control-group">
-    <label class="control-label" for="monthdownload">Month</label>
+    <label class="control-label" for="monthdownload">Date as Of</label>
     <div class="controls">
-      <select name="monthdownload" id="monthdownload">
-			<option>Select Month</option>
-		<?php 
-		for ($i=1; $i < 12 ; ) { 
-			
-		foreach ($montharray as $key => $val) {
-			
-			$year=$montharray[$key];
-			
-			?>
-			<option value="<?php echo $i;?>"><?php echo $year;?></option>
-			
-		<?php $i++;}
-		}
-		?>
-		</select>
+      <input class="span2 dateclass" type="text" placeholder="Date as of" id="dateas_of" name="dateas_of">
     </div>
   </div>
   
-  <div class="control-group">
-    <label class="control-label" for="year_download">Year</label>
-    <div class="controls">
-      <select name="year_download" id="year_download">
-			<option>Select Year</option>
-			<?php
-		for($x=$current_year;$x>=$earliest_year;$x--){
-			?>
-			<option value="<?php echo $x;?>"
-			<?php
-			if ($x == $current_year) {echo "selected";
-			}
-			?>><?php echo $x;?></option>
-			<?php }?>
-		</select>
-    </div>
-  </div>
+  
   <div class="control-group">
     <div class="controls">
       
@@ -262,7 +199,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Date Received</th>
-		<th>Date Delayed</th>
+		<th>Revised ETA</th>
 		<th>No Days Delayed</th>
 		<th>Quantity Expected</th>
 		<th>Quantity Received</th>
@@ -308,11 +245,11 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 							<td><?php if ($val['transaction_type']=='PENDINGKEMSA') {
 								echo '<button class="btn btn-mini btn-warning" id="" name="" >Pending</button>';
 							} elseif($val['transaction_type']=='INCOUNTRY') {
-								echo '<button class="btn btn-mini btn-success" id="" name="" >Not-Cleared</button>';
+								echo '<button class="btn btn-mini btn-success" id="" name="" >Arrived Awaiting clearance</button>';
 							}elseif($val['transaction_type']=='DELAYED') {
-								$status= '<button class="btn btn-mini btn-danger" id="" name="" >Delayed</button>';
+								echo '<button class="btn btn-mini btn-danger" id="" name="" >Delayed</button>';
 							}elseif($val['transaction_type']=='RECEIVED') {
-								$status= '<button class="btn btn-mini btn-success" id="" name="" >Received</button>';
+								echo '<button class="btn btn-mini btn-success" id="" name="" >Received</button>';
 							}
 							 ?></td>
 							
@@ -330,11 +267,70 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
   <script>
 	$(document).ready(function() {
 	$(function() {
+		$( "#kemsa-less" ).hide( "fast");
+		$( "#psi-less" ).hide( "fast");
 		$( ".dateclass" ).datepicker({
 			showAnim:'drop',
 			dateFormat: 'd M yy', 
 			
 		});
+		
+		
+			
+			
+		$('.enlarge').click(function(){
+	
+		
+		var myID = $(this).attr('id');
+		switch(myID){
+		case'kemsa-more':
+		$( ".containpsi" ).hide( "fast");	
+		$( "#kemsa-less" ).show( "fast");
+		$( "#kemsa-more" ).hide( "fast");
+		$('.containkemsa').animate({height:'48%',width:'95%'}, 500);
+		$('#mos_kemsa').animate({height:'70%',width:'95%'}, 500);
+		$('.mos_kemsa').load('<?php echo base_url()."Fp_management/kemsa_data"?>');
+	
+		break;
+				
+		case'kemsa-less':
+		 $( ".containpsi" ).show( "fast");	
+		 $( "#kemsa-less" ).hide( "fast");
+		 $( "#kemsa-more" ).show( "fast");
+		 $('.containkemsa').animate({height:'50%',width:'48%'}, 500);
+		 $('#mos_kemsa').animate({height:'50%',width:'48%'}, 500);
+		 $('.mos_psi').load('<?php echo base_url()."Fp_management/psi_data"?>');
+		 $('.mos_kemsa').load('<?php echo base_url()."Fp_management/kemsa_data"?>');
+	  
+		break;
+		
+		case'psi-more':
+		$( ".containkemsa" ).hide( "fast");	
+		$( "#psi-less" ).show( "fast");
+		$( "#psi-more" ).hide( "fast");
+		$('.containpsi').animate({height:'48%',width:'95%'}, 500);
+		$('#mos_psi').animate({height:'70%',width:'95%'}, 500);
+		$('.mos_psi').load('<?php echo base_url()."Fp_management/psi_data"?>');
+	  
+		break;
+		
+		case'psi-less':
+		$( ".containkemsa" ).show( "fast");	
+		 $( "#psi-less" ).hide( "fast");
+		 $( "#psi-more" ).show( "fast");
+		 $('.containpsi').animate({height:'50%',width:'48%'}, 500);
+		 $('#mos_kemsa').animate({height:'50%',width:'48%'}, 500);
+		 $('.mos_psi').load('<?php echo base_url()."Fp_management/psi_data"?>');
+		 $('.mos_kemsa').load('<?php echo base_url()."Fp_management/kemsa_data"?>');
+	  
+		break;
+	
+		}
+		
+		  
+	});
+	
+	
 		
 		$("#commoditychange").val(1)
 		
@@ -374,8 +370,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
     $('#filter').click(function() {
     	var fyear=$("#financeyear").val();
     	var fcommodity=$("#commoditychange1").val();
-    	var fcommodity2=$("#commoditychange2").val();
-    	
+    	   	
     	if (fyear==0) {
 						
 						alert("Please select Financial Year");
@@ -399,7 +394,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
     	var asof=$("#as_of").val();
     	
     	
-    				if (asof==0) {
+    				if (asof=='') {
 						
 						alert("Please Enter a Date  ");
 						return;
@@ -413,19 +408,15 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 		});
 		
 		$('#filter_psi').click(function() {
-    	var kmonth=$("#monthpsi").val();
-    	var kyear=$("#year_psi").val();
+    	var psidate=$("#as_of_psi").val();
     	
-    	if (kyear==0) {
+    	
+    				if (psidate=='') {
 						
-						alert("Please select Year");
+						alert("Please Enter date");
 						return;
 					}
-					if (kmonth==0) {
-						
-						alert("Please select Month.");
-						return;
-					}
+					
          var div=".mos_psi";
 		var url = "<?php echo base_url()."Fp_management/psi_data"?>";		
 		
@@ -439,7 +430,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
 	 $.ajax({
           type: "POST",
-           data: {graphtype: $("#graphtype").val(),financeyear: $("#financeyear").val(),commoditychange1: $("#commoditychange1").val(),commoditychange2: $("#commoditychange2").val()},
+           data: {graphtype: $("#graphtype").val(),financeyear: $("#financeyear").val(),commoditychange1: $("#commoditychange1").val()},
           url: url,
           beforeSend: function() {
             $(div).html("");
@@ -460,7 +451,7 @@ function ajax_request1 (url,div){
 	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
 	 $.ajax({
           type: "POST",
-           data: {year_psi: $("#year_psi").val(),monthpsi: $("#monthpsi").val()},
+           data: {as_of_psi: $("#as_of_psi").val()},
           url: url,
           beforeSend: function() {
             $(div).html("");
@@ -503,11 +494,11 @@ function ajax_request (url,div){
 		
 	$('.download').click(function() {
          
-         	var year=$('#year_download').val();
-         	var month=$('#monthdownload').val();
+         	var dateof=$('#dateas_of').val();
+         	
          	//alert (month);
          	//return;
-			window.location="<?php echo base_url();?>reports/getstock_summary/"+encodeURIComponent(year)+"/"+encodeURIComponent(month);
+			window.location="<?php echo base_url();?>reports/getstock_summary/"+encodeURIComponent(dateof);
 		
 		});
   });

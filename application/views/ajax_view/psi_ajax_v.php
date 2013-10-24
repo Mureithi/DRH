@@ -25,7 +25,7 @@ var chart;
 						
 					},
 					title: {
-                text: 'Stock Status of FP Commodities in Private Sector Pipeline '
+                text: 'Stock Status in Private Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?> & <?php echo date('F , Y ', strtotime($graphtext2)) ?> '
             },plotOptions: {
                 series: {
                     stacking: 'normal'
@@ -50,9 +50,14 @@ var chart;
 		enabled: false
 		},
                 series: [{
-                name: 'Stores MOS',
+                name: 'Actual MOS(PSI)',
+                pointWidth: 9,
+                data: <?php echo $array_finalpend ?>
+            },{
+                name: 'Pending MOS(PSI)',
+                 pointWidth: 9,
                 data: <?php echo $array_finalpsi ?>
-            } ]
+            }  ]
         	
 				});
         

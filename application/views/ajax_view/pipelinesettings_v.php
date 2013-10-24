@@ -65,18 +65,21 @@
   <div class="control-group">
     <label class="control-label" for="Store">Status</label>
     <div class="controls">
-      <input type="text" id="Store" name="Store" class="" value="<?php if ($val['transaction_type']=='INCOUNTRY') {
-								echo 'Received - Not Cleared';
-							} elseif($val['transaction_type']=='RECEIVED') {
-								echo 'Received - Complete';
-							}
-							 ?>">
+     <select  id="status" name="status" >
+   			 <option value="0">Select Status</option>
+			<option value="1">Arrived Awaiting clearance</option>
+			<option value="2">Received in Store</option>
+			<option value="3">Delayed</option>
+			<option value="4">Canceled</option>
+			
+		
+	</select>
     </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="Date_of">Date Received</label>
     <div class="controls">
-      <input type="text" id="Date_receive" name="Date_receive" class="my_date" value="<?php echo  date('F j Y ', strtotime($val['fp_date']));?>">
+      <input type="text" id="Date_receive" name="Date_receive" class="my_date" value="<?php echo  date('F j Y ', strtotime($val['date_receive']));?>">
     </div>
   </div>
   
@@ -96,6 +99,17 @@ echo form_close();
 	 
   <script>
   	$(document).ready(function() {
+  		
+  		$("#status").val(<?php if ($val['transaction_type']=='INCOUNTRY') {
+								echo '1';
+							} elseif($val['transaction_type']=='RECEIVED') {
+								echo '2';
+							}elseif($val['transaction_type']=='DELAYED') {
+								echo '3';
+							}elseif($val['transaction_type']=='CANCELED') {
+								echo '4';
+							}
+							 ?>)
 	$(function() {
 	var id=$("#fpcommodityid").val();
 		$("#fpcommodity").val(id);

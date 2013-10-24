@@ -218,10 +218,10 @@ return i;
 <?php
 if($user_is_facility){
 ?>
-<li class=""><a  href="<?php echo base_url(); ?>home_controller">Home</a></li>
+<li class=""><a  href="<?php echo base_url(); ?>home_controller">Service Statistics</a></li>
  	 
 <!--<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Stock Management</a></li>-->
-<li><a  href="<?php echo base_url(); ?>fp_management/" class="">Pipeline</a></li>
+<li><a  href="<?php echo base_url(); ?>fp_management/" class="">Commodities</a></li>
 <li><a  href="<?php echo base_url(); ?>settings" class="">Settings</a></li>
 <?php }  ?>
 
