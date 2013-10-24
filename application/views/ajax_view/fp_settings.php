@@ -12,33 +12,18 @@
 	background: #FEFFC8 url('<?php echo base_url()?>Images/excel-icon.jpg') 20px 50% no-repeat;
 	border: 1px solid #F1AA2D;
 	}
-	</style>	
-<div class="edit_plan">
-  	<!--<h2>
-		
-		<select  id="commoditychange" name="commoditychange" >
-    <option>Select Commodity</option>
-		<?php 
-		foreach ($fpcommodity as $fpcommodity1) {
-			$id=$fpcommodity1->id;
-			$commodity=$fpcommodity1->fp_name;
-			?>
-			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
-		<?php }
-		?>
-	</select> 
-	<select  id="financeyear" name="financeyear" >
-    <option value="0">Select Fiscal Year</option>
-    <option value="2013-2014">2013-2014</option>
-    <option value="2012-2013">2012-2013</option>
-    <option value="2011-2012">2012-2011</option>
-		
-	</select> 
-	<button class="btn btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
-	<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply Plan Vs Actual</a>
-
-	</h2>-->
-	
+	</style>
+	<ul id="myTab" class="nav nav-tabs">
+              <li class="active"><a href="#commodities" data-toggle="tab" style="font-size: 12px">Commodities</a></li>
+              <li><a href="#profile" data-toggle="tab" style="font-size: 12px">Funding Sources</a></li>
+              
+              
+              
+            </ul>
+            <div id="myTabContent" class="tab-content">
+              <div class="tab-pane fade in active" id="commodities">
+              	<div class="edit_plan">
+  		
 <div id="table_filtered">
 	
 <table id="example" class="table table-hover table-bordered">
@@ -88,10 +73,97 @@
 </table>
 </div>
   </div>
-
+              </div>
+              <div class="tab-pane fade" id="profile">
+<div id="table_filtered">
+	
+<table class="table table-hover table-bordered" style="width:90%;margin:auto; ">
+		
+		<thead style="font-size: 13px; background: #C8D2E4 ">
+			<th colspan="7">
+			<button class="btn btn-small btn-success" id="" style="margin-left: 90%" name="" data-toggle="modal" data-target="#downloadModal">New Source<i class="icon-plus"></i></button>
+			
+		</th>
+	<tr>
+		<th>Funding Source</th>
+		<th>Procuring Agency</th>
+		<th>Status</th>
+		<th >Action </th>
+	</tr>
+	</thead>
+	<tbody>
+		<?php 
+		foreach ($funding as $val ) {
+			
+		?>						
+						<tr style="font-size: 12px">
+							<td><?php echo $val->funding_source;?></td>
+							<td><?php  if ($val->procuring_a==0) {
+								echo "NO";
+							} else {
+								echo "YES";
+							}
+							
+							?></td>
+							<td><?php  if ($val->service_active==0) {
+								echo "Disabled";
+							} else {
+								echo "Active";
+							}
+							
+							?></td>
+							<td><button class="btn btn-mini btn-success " id="<?php echo $val->id;?>" value="" >Edit <i class="icon-edit"></i></button>
+															</td>
+							
+															
+					   </tr>
+					   
+				<?php }?>	 
+						
+		</tbody>
+		
+</table>
+</div>              </div>
+              
+            </div>
+            
+            <div id="downloadModal" class="modal hide fade " tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
+		<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+    <h2 style="font-size: 16px;text-align: center" id="myModalLabel">Add Source</h2>
+    <div class="form-horizontal">
+    	
+  <div class="control-group">
+    <label class="control-label" for="source">Source Name</label>
+    <div class="controls">
+      <input class="span2 " type="text" placeholder="Source Name" id="" name="">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="Procurement Agency">Source Name</label>
+    <div class="controls">
+      <input type="radio" />
+    </div>
+  </div>
+  
+  
+  <div class="control-group">
+    <div class="controls">
+      
+      <button type="submit" class="btn download">Create</button>
+    </div>
+  </div>
+</div>
+      </div>
+      </div>
+ 
 <script>
   	$(document).ready(function() {
 	$(function() {
+		 $('#myTab a').click(function (e) {
+ 		 e.preventDefault();
+ 			 $(this).tab('show');
+})
   	 $('#filter').click(function() {
          var div="#table_filtered";
 		var url = "<?php echo base_url()."Fp_management/supply_plan_filter"?>";		

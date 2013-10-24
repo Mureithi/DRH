@@ -65,9 +65,8 @@ $facility_Code=$this -> session -> userdata('news');
 li a{
 	font:color;
 }
-.active{
-	background:#29527b url('<?php echo base_url()?>Images/sidebar-menu-arrow.png') right no-repeat;
-	
+.current{
+	background:#29527b;
 	color: #fff;
 }
 
@@ -76,12 +75,12 @@ li a{
 	$(document).ready(function() {
 		
 		$("li").click(function(){
-  // If this isn't already active
-  if (!$(this).hasClass("active")) {
-    // Remove the class from anything that is active
-    $("li.active").removeClass("active");
-    // And make this active
-    $(this).addClass("active");
+  // If this isn't already current
+  if (!$(this).hasClass("current")) {
+    // Remove the class from anything that is current
+    $("li.current").removeClass("current");
+    // And make this current
+    $(this).addClass("current");
   }
 });
 		var url = "<?php echo base_url().'Settings/supply_plan_s'?>";      
@@ -130,9 +129,9 @@ li a{
 
       <div class="nav-list">
       	  <ul>
-      	<li id="plan_settings" class="active">Supply Plan</li>
-      	<li id="fp_settings">Fp Commodities</li>
+      	<li id="plan_settings" class="current">Supply Plan</li>
       	<li id="soh_settings">Stock On Hand</li>
+      	<li id="fp_settings">Other Settings</li>
       	
       	
      	 </ul>

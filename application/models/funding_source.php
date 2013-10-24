@@ -3,6 +3,8 @@ class Funding_source extends Doctrine_Record {
 
 	public function setTableDefinition() {
 				$this->hasColumn('funding_source', 'varchar', 100);
+				$this->hasColumn('procuring_a', 'integer', 2);
+				$this->hasColumn('service_active', 'integer', 2);
 				
 				
 	}

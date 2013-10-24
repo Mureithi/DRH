@@ -38,6 +38,7 @@ public function supply_plan_s()
 public function fpcommodity_s()
 {
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
+		$data['funding'] = Funding_source::getAllfpfundingsources();
 		$this -> load -> view("ajax_view/fp_settings", $data);
 			
 }
