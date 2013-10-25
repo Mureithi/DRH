@@ -25,7 +25,7 @@ var chart;
 						
 					},
 					title: {
-                text: 'Stock Status in Private Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?> & <?php echo date('F , Y ', strtotime($graphtext2)) ?> '
+                text: 'Stock Status in Private Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?> '
             },plotOptions: {
                 series: {
                     stacking: 'normal'

@@ -35,23 +35,22 @@ class Fp_management extends MY_Controller {
 		$data['banner_text'] = "Edit Supply Plan";
 		$data['editdata'] = Pipeline::getAll_edit($trid);
 		$this -> load -> view("template", $data);
-		
 
 	}
 	public function update_transaction() {
 		$action=$_POST['action'];
 		$cancel_date=$_POST['cancel_date'];	
 		$trid=$_POST['trid'];		
-	    $Receive=$_POST['Receive'];
+	    $Receive=$_POST['receive'];
 		$qtyReceive=$_POST['qtyReceive'];
 		$receive_wait=$_POST['receive_wait'];
 		$qty_incountry=$_POST['qty_incountry'];
 		$delay=$_POST['delay'];
 		$comment=$_POST['comment'];
-		$cancel_date=date('y-m-d',strtotime($cancel_date));
-		$date_incountry=date('y-m-d',strtotime($receive_wait));
-		$receivedate=date('y-m-d',strtotime($Receive));
-		$delaydate=date('y-m-d',strtotime($delay));
+		$cancel_date=date('Y-m-d',strtotime($cancel_date));
+		$date_incountry=date('Y-m-d',strtotime($receive_wait));
+		$receivedate=date('Y-m-d',strtotime($Receive));
+		$delaydate=date('Y-m-d',strtotime($delay));
 		
 		if ($action==1) {
 			$updateaction='INCOUNTRY';
@@ -69,7 +68,7 @@ class Fp_management extends MY_Controller {
 		
 		$con = Doctrine_Manager::getInstance() -> connection();
 		$st = $con -> execute( " UPDATE  `drh`.`pipeline` SET  `date_receive` =  '$receivedate', `qty_receive` = '$qtyReceive',
-		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `comment` = '$comment',`date_incountry` = '$date_incountry', `qty_incountry` = '$qty_incountry' WHERE  `pipeline`.`id` ='$trid'; ");
+		`transaction_type`='$updateaction' ,`delay_to` = '$delaydate', `cancel_date`='$cancel_date',`comment` = '$comment',`date_incountry` = '$date_incountry', `qty_incountry` = '$qty_incountry' WHERE  `pipeline`.`id` ='$trid'; ");
 		
 			//exit;
 		$this->session->set_flashdata('system_success_message', "Transaction Updated");

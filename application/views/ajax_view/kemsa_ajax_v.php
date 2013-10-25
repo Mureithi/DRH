@@ -34,7 +34,7 @@ var chart;
 						
 					},
 					title: {
-                text: 'Stock Status in Public Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?> & <?php echo date('F , Y ', strtotime($graphtext2)) ?>'
+                text: 'Stock Status in Public Sector Pipeline As at end of <?php echo  date('F , Y ', strtotime($graphtext1)) ?>'
             },
             subtitle: {
                 text: 'Source: DRH,KEMSA,NASCOP,UNFPA,KfW,USAID,DFID,LMU',

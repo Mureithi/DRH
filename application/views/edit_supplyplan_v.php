@@ -86,7 +86,6 @@
 		<th>Funding Source</th>
 		<th>E.T.A Details</th>
 		<th>Quantity</th>
-		<th>Pending as of</th>
 		<th>Status | Action</th>
 		
 	</tr>
@@ -103,7 +102,6 @@
 							<td><?php echo $val['funding_source'];?></td>
 							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
 							<td><?php echo number_format($val['fp_quantity']);?></td>
-							<td><?php echo date('F j, Y ', strtotime($val['pending_as_of']));?></td>
 							<td><?php if ($val['transaction_type']=='PENDINGKEMSA') {
 								echo "<button class='btn btn-mini btn-warning'  >Pending</button>
 								<button class='btn btn-mini btn-success Editable' id='$id'>Edit</button>";

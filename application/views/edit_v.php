@@ -84,14 +84,14 @@
     </div>
   </div>
   <div class="controls controls-row" id="actionreceive_wait" style=" margin-bottom:1em; ">
-              <input class="span2 dateclass" type="text" placeholder="Receive Date" id="receive_wait" name="receive_wait">
+              <input class="span2 dateclass" type="text" placeholder="Date Incountry" id="receive_wait" name="receive_wait">
               <input class="span2" type="text" placeholder="Quantity Received" id="qty_incountry" name="qty_incountry">
             </div>
             <div class="controls controls-row" id="cancel" style=" margin-bottom:1em; ">
               <input class="span2 dateclass" type="text" placeholder="Cancel Date" id="cancel_date" name="cancel_date">
                </div>
   <div class="controls controls-row" id="actionreceive" style=" margin-bottom:1em; ">
-              <input class="span2 dateclass" type="text" placeholder="Date Received" id="Receive" name="Receive">
+              <input class="span2 dateclass" type="text" placeholder="Date in Store" id="receive" name="receive">
               <input class="span2" type="text" placeholder="Quantity Received" id="qtyReceive" name="qtyReceive">
             </div>
             
@@ -125,10 +125,10 @@ echo form_close();
 		var radio_value = $(this).val();
 
 				if (radio_value == '1') {
-					$("#actionreceive").show("slow");
+					$("#actionreceive_wait").show("slow");
 					$("#actiondelay").hide("fast");
 					$("#cancel").hide("slow");
-					$("#actionreceive_wait").hide("fast");
+					$("#actionreceive").hide("fast");
 					$('#delay').val('');
 					$('#comment').val('');
 					$('#receive_wait').val('');
@@ -147,10 +147,10 @@ echo form_close();
 					$('#cancel_date').val('');
 				}
 				else if (radio_value == '2') {
-					$("#actionreceive_wait").show("slow");
+					$("#actionreceive").show("slow");
 					$("#cancel").hide("slow");
 					$("#actiondelay").hide("fast");
-					$("#actionreceive").hide("fast");
+					$("#actionreceive_wait").hide("fast");
 					$('#Receive').val('');
 					$('#qtyReceive').val('');
 					$('#delay').val('');

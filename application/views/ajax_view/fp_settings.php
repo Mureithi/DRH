@@ -13,6 +13,7 @@
 	border: 1px solid #F1AA2D;
 	}
 	</style>
+	
 	<ul id="myTab" class="nav nav-tabs">
               <li class="active"><a href="#commodities" data-toggle="tab" style="font-size: 12px">Commodities</a></li>
               <li><a href="#profile" data-toggle="tab" style="font-size: 12px">Funding Sources</a></li>

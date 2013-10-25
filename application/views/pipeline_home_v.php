@@ -231,13 +231,14 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 								echo date('F j, Y ', strtotime($val['delay_to']));
 							}
 							 ?></td>
-							 <td><?php if ($val['delay_to']=='0000-00-00'||$val['delay_to']=='1970-01-01') {
-								echo '-';
-							} else {
-								//echo date('F j, Y ', strtotime());
-								echo $diff = (strtotime($val['delay_to']) - strtotime($val['fp_date']))/ (60 * 60 * 24).' '.'days';
+							 <td><?php 
+								if ($val['transaction_type']=='INCOUNTRY'||$val['transaction_type']=='RECEIVED') {
+									
+									echo $diff = (strtotime($val['date_receive']) - strtotime($val['fp_date']))/ (60 * 60 * 24).' '.'days';
+								} elseif($val['transaction_type']=='DELAYED') {
+									echo $diff = (strtotime($val['delay_to']) - strtotime($val['fp_date']))/ (60 * 60 * 24).' '.'days';
+								}
 								
-							}
 							 ?></td>
 							<td><?php echo number_format($val['fp_quantity']);?></td>
 							<td><?php echo number_format($val['qty_receive']);?></td>
