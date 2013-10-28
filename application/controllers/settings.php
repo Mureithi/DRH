@@ -182,7 +182,6 @@ public function edit_soh($fpid) {
 		$data['soh'] = Pipeline::getid_soh($fpid);
 		$this -> load -> view("template", $data);
 		
-
 	}
 
 public function delete_soh($fpid) {

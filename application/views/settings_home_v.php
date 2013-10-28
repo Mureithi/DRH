@@ -93,7 +93,7 @@ li a{
 		ajax_request (url,div);
     });
     
-    $("#fp_settings").click(function(){
+    $("#other_settings").click(function(){
       var url = "<?php echo base_url().'Settings/fpcommodity_s'?>";      
           var div=".reportsdisplay";  
 		ajax_request (url,div);
@@ -131,7 +131,7 @@ li a{
       	  <ul>
       	<li id="plan_settings" class="current">Supply Plan</li>
       	<li id="soh_settings">Stock On Hand</li>
-      	<li id="fp_settings">Other Settings</li>
+      	<li id="other_settings">Other Settings</li>
       	
       	
      	 </ul>

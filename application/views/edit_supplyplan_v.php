@@ -45,35 +45,7 @@
        <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan_vs_actual">View Supply Plan Vs Actual</a>   -->   
             </div>
   <div class="edit_plan">
-  	<!--<h2>
-		
-		<select  id="commoditychange" name="commoditychange" >
-    <option>Select Commodity</option>
-		<?php 
-		foreach ($fpcommodity as $fpcommodity1) {
-			$id=$fpcommodity1->id;
-			$commodity=$fpcommodity1->fp_name;
-			?>
-			<option value="<?php echo $id;?>"><?php echo $commodity;?></option>
-		<?php }
-		?>
-		</select> 
-	<input class="span2 dateclass" type="text" placeholder="Date" id="datefrom" name="datefrom">
-	<select  id="funding_source" name="funding_source" >
-    <option value="0">Funding Source</option>
-    <?php 
-		foreach ($fundingsource as $fundingsource1) {
-			$id=$fundingsource1->id;
-			$source=$fundingsource1->funding_source;
-			?>
-			<option value="<?php echo $id;?>"><?php echo $source;?></option>
-		<?php }
-		?>
-	</select> 
-	<button class="btn btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
-	<!--<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply Plan Vs Actual</a>
-
-	</h2>-->
+  	
 <div id="table_filtered">
 	
 <table id="example" class="table table-hover table-bordered">
