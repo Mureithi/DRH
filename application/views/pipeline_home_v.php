@@ -14,8 +14,8 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 .higherWider {
     height: 100%;
     overflow-y: auto;
-    width: 75%;
-   margin-left: -35%;
+    width: 80%;
+   margin-left: -40%;
    max-height: 900px;
    max-width: 1500px;
 }
@@ -69,6 +69,9 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 		margin-top:1.5em;
 		margin-left:14%;
 	}
+	.nav-tabs a{
+		font-size:15px;
+	}
 </style>
 
 
@@ -76,7 +79,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_home">Enter Stocks on Hand</a>
 <!--<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/Supply_plan">Supply Plan</a>-->
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/editsupply_plan">Update Supply Plan</a>
-<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH-KEMSA</a>
+<a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH</a>
 <button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#supplyplanModal">View Supply Plan</button>
 <!--<button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#downloadModal">Downloads</button>-->
 
@@ -162,7 +165,13 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
     <h2 style="font-size: 16px;text-align: center" id="myModalLabel">Estimated Time Of Arrival Of Pending FP Consignments (Public Sector Pipeline)</h2>
      <h3 style="font-size: 15px;text-align: center" id="myModalLabel">Supply Plan</h3>
       </div>
-
+      <ul class="nav nav-tabs" id="myTab">
+  <li class="active"><a href="#home">Pipeline</a></li>
+  <li><a href="#profile">Received</a></li>
+  
+		</ul>
+		<div class="tab-content" >
+<div class="tab-pane active" id="home">
   <table class="table table-hover table-bordered">
 		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
 			<tr>
@@ -241,7 +250,82 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 			
 	 
 </table>
-  
+ </div> 
+ <div class="tab-pane" id="profile"><div class="tab-pane" id="home">
+  <table class="table table-hover table-bordered">
+		<thead style="font-weight:bold; background: #fefefd;font-size: 13px; ">
+			<tr>
+				
+				<th colspan="5" style="text-align:center"></th>
+			</tr>
+		</thead>
+		<thead style="font-size: 13px; background: #C8D2E4 ">
+	<tr>
+		<th>FP Commodity</th>
+		<th>Unit</th>
+		<th>Funding Source</th>
+		<th>E.T.A Details</th>
+		<th>Date Received</th>
+		<th>Revised ETA</th>
+		<th>No Days Delayed</th>
+		<th>Quantity Expected</th>
+		<th>Quantity Received</th>
+		<th>Quantity Remaining</th>
+		<th>Status</th>
+		
+	</tr>
+	</thead>
+	<tbody>
+		<?php 
+		foreach ($received as $val ) {
+			
+			
+		?>						
+						<tr style="font-size: 12px">
+							<td><?php echo $val['fp_name'];?></td>
+							<td><?php echo $val['Unit'];?></td>
+							<td><?php echo $val['funding_source'];?></td>
+							<td><?php echo  date('F j, Y ', strtotime($val['fp_date']));?></td>
+							<td><?php if ($val['date_receive']=='0000-00-00'||$val['date_receive']=='1970-01-01') {
+								echo '-';
+							} else {
+								echo date('F j, Y ', strtotime($val['date_receive']));
+							}
+							 ?></td>
+							<td><?php if ($val['delay_to']=='0000-00-00'||$val['delay_to']=='1970-01-01') {
+								echo '-';
+							} else {
+								echo date('F j, Y ', strtotime($val['delay_to']));
+							}
+							 ?></td>
+							 <td><?php 
+								if ($val['transaction_type']=='INCOUNTRY'||$val['transaction_type']=='RECEIVED') {
+									
+									echo $diff = (strtotime($val['date_receive']) - strtotime($val['fp_date']))/ (60 * 60 * 24).' '.'days';
+								} elseif($val['transaction_type']=='DELAYED') {
+									echo $diff = (strtotime($val['delay_to']) - strtotime($val['fp_date']))/ (60 * 60 * 24).' '.'days';
+								}
+								
+							 ?></td>
+							<td><?php echo number_format($val['fp_quantity']);?></td>
+							<td><?php echo number_format($val['qty_receive']);?></td>
+							<td><?php echo number_format($val['fp_quantity']-$val['qty_receive']);?></td>
+							<td><?php if ($val['transaction_type']=='RECEIVED') {
+								echo '<button class="btn btn-mini btn-info" id="" name="" >Received</button>';
+							} 
+							 ?></td>
+							
+					   </tr>
+					   
+				<?php }?>	 
+						
+		</tbody>
+		
+			
+	 
+</table>
+ </div> </div>
+  </div>
   </div>
   <script>
 	$(document).ready(function() {
@@ -254,7 +338,10 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 			
 		});
 		
-		
+		$('#myTab a').click(function (e) {
+ 		 e.preventDefault();
+ 			 $(this).tab('show');
+})
 			
 			
 		$('.enlarge').click(function(){

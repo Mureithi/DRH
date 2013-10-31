@@ -72,6 +72,12 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 			?>><?php echo $x;?></option>
 			<?php }?>
 		</select>
+		<select name="store" id="store">
+			<option>Select Store</option>
+			<option value="SOHKEMSA">KEMSA</option>
+			<option value="SOHPSI">PSI</option>
+			
+		</select>
 	<button class="btn btn-success" id="filter" name="filter" style="margin-left: 1em;">Filter <i class="icon-filter"></i></button> 
 	<!--<a class="link" data-toggle="modal" data-target="#addfpcommodityModal" href="#">View Supply  Plan Vs Actual</a>-->
 
@@ -118,14 +124,10 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 							<td><?php echo $value['sohkemsa'];?></td>
 							<td><?php echo number_format($value['projected_monthly_c']);?></td>
 							<td><?php echo date('F j, Y ',strtotime($value['fp_date'])); ;?></td>
-							<td><?php if ($value['transaction_type']=='PENDINGKEMSA') {
-								echo '<button class="btn btn-mini btn-warning" id="" name="" >Pending</button>';
-							} elseif($value['transaction_type']=='INCOUNTRY') {
-								echo '<button class="btn btn-mini btn-success" id="" name="" >Received</button>';
-							}elseif($value['transaction_type']=='SOHKEMSA') {
-								echo '<button class="btn btn-mini btn-success" id="" name="" >SOH</button>';
-							}else {
-								echo '<button class="btn btn-mini btn-danger" id="" name="" >Delayed</button>';
+							<td><?php if ($value['transaction_type']=='SOHKEMSA') {
+								echo '<button class="btn btn-mini btn-success" id="" name="" >SOHKEMSA</button>';
+							} elseif($value['transaction_type']=='SOHPSI') {
+								echo '<button class="btn btn-mini btn-info" id="" name="" >SOHPSI</button>';
 							}
 							 ?></td>
 					   </tr>
@@ -160,7 +162,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 	 $.ajax({
           type: "POST",
           url: url,
-          data: { year_from: $("#year_from").val(),month: $("#month").val() },
+          data: { year_from: $("#year_from").val(),store: $("#store").val(),month: $("#month").val() },
           beforeSend: function() {
             $(div).html("");
             

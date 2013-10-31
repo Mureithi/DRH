@@ -24,6 +24,7 @@ class Fp_management extends MY_Controller {
 		$data['kemsa_psi'] = Pipeline::kemsa_psi();
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
 		$data['supplyplan'] = Pipeline::get_supply_plan();
+		$data['received'] = Pipeline::get_received();
 		$data['fundingsource'] = Funding_source::getAllfpfundingsources();
 		$this -> load -> view("template", $data);
 	}
@@ -137,13 +138,14 @@ public function soh_detailed() {
 	   
 		$year_from=date('Y');		
 	    $month=date('n');
-		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month);
-		$data['mycount'] = count(Pipeline::soh_kemsa_psi($year_from,$month));
+		$store='SOH';
+		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month,$store);
+		$data['mycount'] = count(Pipeline::soh_kemsa_psi($year_from,$month,$store));
 		$data['content_view'] = "soh_detailed";
 		$data['title'] = "SOH";
-		$data['banner_text'] = "SOH-KEMSA";
+		$data['banner_text'] = "SOH";
 		$data['fpcommodity'] = Fpcommodities::getAllfpcommodities();
-		$data['supplyplan'] = Pipeline::soh_kemsa_psi($year_from,$month);;
+		$data['supplyplan'] = Pipeline::soh_kemsa_psi($year_from,$month,$store);;
 		$this -> load -> view("template", $data);	
 		//}
 		
@@ -155,8 +157,9 @@ public function soh_filtered() {
 
 		$year_from=$_POST['year_from'];		
 	    $month=$_POST['month'];
-		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month);
-		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month));
+		$store=$_POST['store'];
+		$data['kemsa_psi'] = Pipeline::soh_kemsa_psi($year_from,$month,$store);
+		$mycount=count(Pipeline::soh_kemsa_psi($year_from,$month,$store));
 		
 		if ($mycount==0) {
 			echo "<div style='margin-left:50%;margin-top:5%;font-size:22px'>No Record for $month $year_from</>";

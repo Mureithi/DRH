@@ -50,11 +50,11 @@ var chart;
 		enabled: false
 		},
                 series: [{
-                name: 'Actual MOS(PSI)',
+                name: 'Pending MOS(PSI)',
                 pointWidth: 9,
                 data: <?php echo $array_finalpend ?>
             },{
-                name: 'Pending MOS(PSI)',
+                name: 'Actual MOS(PSI)',
                  pointWidth: 9,
                 data: <?php echo $array_finalpsi ?>
             }  ]

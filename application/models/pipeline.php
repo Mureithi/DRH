@@ -62,13 +62,31 @@ END AS financial_year
 FROM pipeline, fpcommodities, funding_sources
 WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
 AND funding_sources.id = pipeline.`funding_source`
+AND (`transaction_type`='DELAYED' OR `transaction_type`='PENDINGKEMSA' OR `transaction_type`='INCOUNTRY')
 ORDER BY fp_date ASC
 ) AS temp ORDER BY transaction_type
  ");
 
 		return $supplyplan;
 	}
+public static function get_received() {
 
+		$supplyplan = Doctrine_Manager::getInstance() -> getCurrentConnection() -> fetchAll("SELECT * 
+FROM ( SELECT fpcommodities.fp_name, pipeline.id AS tr_id, fpcommodities.Unit, pending_as_of, funding_sources.`funding_source` ,  `fp_date` ,  `fp_quantity` ,  `transaction_type` ,  `qty_receive` ,  `date_receive` , `delay_to` , 
+CASE WHEN MONTH( fp_date ) >=7
+THEN CONCAT( YEAR( fp_date ) ,  '-', YEAR( fp_date ) +1 ) 
+ELSE CONCAT( YEAR( fp_date ) -1,  '-', YEAR( fp_date ) ) 
+END AS financial_year
+FROM pipeline, fpcommodities, funding_sources
+WHERE fpcommodities.id = pipeline.`fpcommodity_Id` 
+AND funding_sources.id = pipeline.`funding_source`
+AND `transaction_type`='RECEIVED'
+ORDER BY fp_date ASC
+) AS temp ORDER BY transaction_type
+ ");
+
+		return $supplyplan;
+	}
 	public static function supply_plan_filter($datefinal,$fpids,$funding_source) {
 
 		$supplyplan = Doctrine_Manager::getInstance() -> getCurrentConnection() -> fetchAll("SELECT * 
@@ -105,14 +123,14 @@ GROUP BY temp.fpcommodity_Id");
 		return $supplyplan;
 	}
 
-	public static function soh_kemsa_psi($year_from, $month) {
+	public static function soh_kemsa_psi($year_from, $month,$store) {
 
 		$supplyplan = Doctrine_Manager::getInstance() -> getCurrentConnection() -> fetchAll("SELECT  `fp_quantity` ,  SUM(`fp_quantity` / fpcommodities.projected_monthly_c) AS sohkemsa, fp_date, `fpcommodity_Id` , fpcommodities.fp_name, Unit, projected_monthly_c,  `transaction_type` 
 FROM pipeline, fpcommodities
 WHERE pipeline.`fpcommodity_Id` = fpcommodities.id
 AND YEAR(  `fp_date` ) = '$year_from'
 AND MONTH(  `fp_date` ) = '$month'
-AND  `transaction_type` =  'SOHKEMSA'
+AND  `transaction_type` LIKE '%$store%'
 GROUP BY  `fpcommodity_Id");
 
 		return $supplyplan;
