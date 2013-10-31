@@ -238,5 +238,60 @@ public function update_soh() {
 		redirect('settings');
 
 	}
+	
+	public function add_fp()
+{
+		$this -> load -> view("ajax_view/new_fp");
+			
+}
+public function add_commodity() {
+		$commodity=$_POST['Commodity'];
+		$description=$_POST['Description'];	
+	    $unitsize=$_POST['unitsize'];	
+		$pmckemsa=$_POST['pmckemsa'];
+		$pmcpsi=$_POST['pmcpsi'];	
+		$dateas_of=$_POST['dateas_of'];
+		$ddate=date('y-m-d',strtotime($dateas_of));
+		
+			
+		$mydata = array('fp_name' => $commodity, 'description'=> $description , 'unit'=>$unitsize,'projected_monthly_c'=>$pmckemsa
+		,'projected_psi'=>$pmcpsi,'as_of'=>$ddate);
+				
+				$u = new Fpcommodities();
+
+    			$u->fromArray($mydata);
+
+    			$u->save();
+		
+		$this->session->set_flashdata('system_success_message', "$commodity was added to your list. ");
+		redirect('settings');
+
+	}
+
+	public function new_source()
+{
+		$this -> load -> view("ajax_view/new_source");
+			
+}
+public function add_source() {
+		$source=$_POST['Source'];
+		$procuring_a=$_POST['procuring_a'];	
+	    $dateas_of=$_POST['dateas_of'];	
+		
+		$ddate=date('y-m-d',strtotime($dateas_of));
+		
+			
+		$mydata = array('funding_source' => $source, 'procuring_a'=> $procuring_a , 'service_active'=>1 ,'date_asof'=>$ddate);
+				
+				$u = new Funding_source();
+
+    			$u->fromArray($mydata);
+
+    			$u->save();
+		
+		$this->session->set_flashdata('system_success_message', "$source was added as a Donor/Procuring Agency. ");
+		redirect('settings');
+
+	}
 	}
 	

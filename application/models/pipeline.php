@@ -149,31 +149,30 @@ pipeline.id='$fpid'");
 
 		return $supplyplan;
 	}
-	public static function getsummary_monthly($date_now,$date_next,$month) {
+	public static function getsummary_monthly($date_now,$date_next,$month,$year) {
 
 		$supplyplan = Doctrine_Manager::getInstance() -> getCurrentConnection() -> fetchAll("SELECT fp.fp_name,fp.Unit, 
-SUM( IF( pi.transaction_type =  'SOHKEMSA',pi.fp_quantity, 0 ) ) AS SOHKEMSA, 
-SUM( IF( pi.transaction_type =  'SOHPSI', pi.fp_quantity, 0 ) ) AS SOHPSI,
-IF( temp.com_trans_type = 'PENDINGKEMSA', temp.total, 0 )  AS PENDINGKEMSA, 
-IF( temp.com_trans_type =  'PENDINGPSI', temp.total, 0 )  AS PENDINGPSI, 
+SUM( IF( pi.transaction_type =  'SOHKEMSA' AND MONTH(pi.fp_date)=$month AND YEAR(pi.fp_date)=$year,pi.fp_quantity, 0 ) ) AS SOHKEMSA, 
+SUM( IF( pi.transaction_type =  'SOHPSI' AND MONTH(pi.fp_date)=$month AND YEAR(pi.fp_date)=$year, pi.fp_quantity, 0 ) ) AS SOHPSI,
+IF( temp.com_trans_type = 'PENDINGKEMSA'  , temp.total, 0 )  AS PENDINGKEMSA, 
+IF( temp.com_trans_type =  'PENDINGPSI' , temp.total, 0 )  AS PENDINGPSI, 
 SUM( IF( pi.transaction_type =  'INCOUNTRY', pi.fp_quantity, 0 ) ) AS RECEIVED_KEMSA, 
 SUM( IF( pi.transaction_type =  'INCOUNTRY_PSI', pi.fp_quantity, 0 ) ) AS RECEIVED_PSI
 FROM pipeline pi
-LEFT JOIN 
-(SELECT c.id as fp_id, c.fp_name as com_name, c.Unit as com_unit, p.transaction_type as com_trans_type, SUM( p.fp_quantity ) AS total
+RIGHT JOIN 
+(SELECT c.id as fp_id, c.fp_name as com_name, c.Unit as com_unit, p.transaction_type as com_trans_type, 
+SUM( p.fp_quantity ) AS total
 FROM pipeline p
-LEFT JOIN fpcommodities c ON c.id = p.fpcommodity_Id
-WHERE MONTH(p.fp_date)='$month'
+RIGHT JOIN fpcommodities c ON c.id = p.fpcommodity_Id
+WHERE p.fp_date BETWEEN  '$date_now'
+AND  '$date_next'
 AND (
 p.transaction_type LIKE  '%PENDINGKEMSA%'
 OR p.transaction_type LIKE  '%PENDINGPSI%'
 )
 GROUP BY p.fpcommodity_Id, p.transaction_type
 ORDER BY c.fp_name ASC ) as temp ON temp.fp_id=pi.fpcommodity_Id
-LEFT JOIN fpcommodities fp ON fp.id = pi.fpcommodity_Id
-WHERE pi.fp_date 
-BETWEEN  '$date_now'
-AND  '$date_next'
+RIGHT JOIN fpcommodities fp ON fp.id = pi.fpcommodity_Id
 GROUP BY fp.fp_name
 ORDER BY  fp.fp_name ASC ");
 

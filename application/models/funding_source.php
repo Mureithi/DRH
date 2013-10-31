@@ -5,6 +5,7 @@ class Funding_source extends Doctrine_Record {
 				$this->hasColumn('funding_source', 'varchar', 100);
 				$this->hasColumn('procuring_a', 'integer', 2);
 				$this->hasColumn('service_active', 'integer', 2);
+				$this->hasColumn('date_asof', 'date');
 				
 				
 	}

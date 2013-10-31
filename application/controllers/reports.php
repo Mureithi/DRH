@@ -8,19 +8,24 @@ function __construct() {
 
 public function index() {
 			
-			$this -> settings_home();
-			
-			
+		$data['content_view'] = "downloads_v";
+		$data['title'] = "Downloads";
+		$data['banner_text'] = "Downloads";
+		//$data['soh'] = Pipeline::getid_soh($fpid);
+		$this -> load -> view("template", $data);
 			}
 
 
 			
-public function getstock_summary($dateof){
-		//$date_of=date('Y-m-d',strtotime($dateof));
-		$split_date=explode('%20', $dateof);
-		$day=$split_date[0];
+public function getstock_summary(){
+		
+		$dateof=$_POST['dateas_of'];
+			
+		$date_of=date('Y-m-d',strtotime($dateof));
+		$split_date=explode('-', $date_of);
+		$year=$split_date[0];
 		$month=$split_date[1];
-		$year=$split_date[2];
+		$day=$split_date[2];
 		//echo $day.'-'.$month.'-'.$year;
 		$date_now=date('Y-m-d',strtotime($year.'-'.$month.'-'.$day)); 
 		$date_next=date('Y-m-d',strtotime(($year+2).'-'.$month.'-'.$day));
@@ -40,7 +45,7 @@ public function getstock_summary($dateof){
 		
 	
 		$report_name='Family Planning Commodities ';
-		$report = Pipeline::getsummary_monthly($date_now,$date_next,$month);
+		$report = Pipeline::getsummary_monthly($date_now,$date_next,$month,$year);
 		$report2 = Pipeline::getsummary_plan($fyear);
 		
 		

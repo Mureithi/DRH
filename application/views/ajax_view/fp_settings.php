@@ -33,7 +33,7 @@
 		<thead style="font-size: 13px; background: #C8D2E4 ">
 			<th colspan="7">
 			* P.M.C - Projected Monthly Consumption
-			<button class="btn btn-small btn-success" id="filter" style="margin-left: 70%" name="filter" >New FP <i class="icon-plus"></i></button>
+			<button class="btn btn-small btn-success" id="new_fp" style="margin-left: 70%" name="new_fp" >New FP <i class="icon-plus"></i></button>
 		</th>
 	<tr>
 		<th>FP Commodity</th>
@@ -82,7 +82,7 @@
 		
 		<thead style="font-size: 13px; background: #C8D2E4 ">
 			<th colspan="7">
-			<button class="btn btn-small btn-success" id="" style="margin-left: 90%" name="" data-toggle="modal" data-target="#downloadModal">New Source<i class="icon-plus"></i></button>
+			<button class="btn btn-small btn-success" style="margin-left: 90%" name="thesource" id="thesource">New Source<i class="icon-plus"></i></button>
 			
 		</th>
 	<tr>
@@ -196,6 +196,38 @@
         });
          
 }
+   $("#new_fp").click(function(){
+      var url = "<?php echo base_url().'Settings/add_fp'?>";      
+          var div=".reportsdisplay";  
+		ajax_add (url,div);
+    });
+    
+     $("#thesource").click(function(){
+      var url = "<?php echo base_url().'Settings/new_source'?>";      
+          var div=".reportsdisplay";  
+		ajax_add (url,div);
+    });
+    
+    
+    function ajax_add (url,div){
+	var url =url;
+	var loading_icon="<?php echo base_url().'Images/loadfill.gif' ?>";
+	 $.ajax({
+          type: "POST",
+          url: url,
+          beforeSend: function() {
+            $(div).html("");
+            
+             $(div).html("<img style='margin-left:50%;margin-top:20%;' src="+loading_icon+">");
+            
+          },
+          success: function(msg) {
+          $(div).html("");
+           $(div).html(msg);        
+          }
+        }); 
+}
+
 jQuery.fn.dataTableExt.oSort['string-case-asc']  = function(x,y) {
 				return ((x < y) ? -1 : ((x > y) ?  1 : 0));
 			};

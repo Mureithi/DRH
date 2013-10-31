@@ -78,7 +78,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/editsupply_plan">Update Supply Plan</a>
 <a class="btn btn-primary " href="<?php echo base_url(); ?>fp_management/soh_detailed">Detailed SOH-KEMSA</a>
 <button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#supplyplanModal">View Supply Plan</button>
-<button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#downloadModal">Downloads</button>
+<!--<button class="btn btn-primary" id="" name="" data-toggle="modal" data-target="#downloadModal">Downloads</button>-->
 
 
         
@@ -154,29 +154,7 @@ $montharray = array(1 => 'January',  2 => 'February',  3 => 'March',  4 => 'Apri
             		<div id="graph_content"></div>
             	</div>
             </div>
-            <div id="downloadModal" class="modal hide fade " tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
-		<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
-    <h2 style="font-size: 16px;text-align: center" id="myModalLabel">Downloads</h2>
-    <div class="form-horizontal">
-    	
-  <div class="control-group">
-    <label class="control-label" for="monthdownload">Date as Of</label>
-    <div class="controls">
-      <input class="span2 dateclass" type="text" placeholder="Date as of" id="dateas_of" name="dateas_of">
-    </div>
-  </div>
-  
-  
-  <div class="control-group">
-    <div class="controls">
-      
-      <button type="submit" class="btn download">Download</button>
-    </div>
-  </div>
-</div>
-      </div>
-      </div>
+            
               
   <div id="supplyplanModal" class="modal hide fade higherWider" tabindex="" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="max-height:50em;">
 <div class="modal-header">
@@ -493,15 +471,7 @@ function ajax_request (url,div){
 			
 		});
 		
-	$('.download').click(function() {
-         
-         	var dateof=$('#dateas_of').val();
-         	
-         	//alert (month);
-         	//return;
-			window.location="<?php echo base_url();?>reports/getstock_summary/"+encodeURIComponent(dateof);
-		
-		});
+	
   });
   });
 </script>

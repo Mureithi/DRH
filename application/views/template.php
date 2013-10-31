@@ -40,20 +40,7 @@ if ($access_level == "kemsa") {
 if ($access_level == "super_admin") {
 	$user_is_super_admin = true;
 }
-if ($access_level == "rtk_manager") {
-	$user_is_rtk_manager = true;
-}
-if ($access_level == "county_facilitator") {
-	$user_is_county_facilitator = true;
-}
 
-if ($access_level == "allocation_committee") {
-	$user_is_allocation_committee = true;
-}
-if ($access_level == "dpp") {
-	$user_is_dpp = true;
-
-}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -222,6 +209,7 @@ if($user_is_facility){
  	 
 <!--<li><a  href="<?php echo base_url(); ?>fp_management/pipeline" class="">Stock Management</a></li>-->
 <li><a  href="<?php echo base_url(); ?>fp_management/" class="">Commodities</a></li>
+<li><a  href="<?php echo base_url(); ?>reports" class="">Downloads</a></li>
 <li><a  href="<?php echo base_url(); ?>settings" class="">Settings</a></li>
 <?php }  ?>
 
